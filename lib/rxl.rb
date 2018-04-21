@@ -3,7 +3,7 @@ require 'rubyXL'
 
 module Rxl
 
-  class Rxl
+  class Excel
     attr_accessor :hash_workbook
 
     # class generates based on input type:
@@ -22,7 +22,7 @@ module Rxl
         @hash_workbook = {}
         source.each { |sheet_name| @hash_workbook.update({sheet_name => {}}) }
       else
-        raise("source argument of class '#{source.class}' not handled by the Rxl class")
+        raise("source argument of class '#{source.class}' not handled by the Excel class")
       end
     end
 
