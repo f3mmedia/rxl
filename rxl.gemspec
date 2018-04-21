@@ -9,8 +9,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Ian McWilliams"]
   spec.email         = ["ian.mcwilliams@f3mmedia.co.uk"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = "A ruby spreadsheet interface"
+  spec.description   = <<~DESC
+    Implements functionality written with Excel users in mind for straight reading and writing of sheets.
+    Row and column scope values are written to only the cells used; cells are specified by their Excel (A1) ID.
+  DESC
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
