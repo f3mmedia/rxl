@@ -50,9 +50,16 @@ class Excel
       else
         rubyxl_workbook.add_worksheet(hash_key)
       end
+      set_hash_worksheet_defaults(hash_value)
       hash_worksheet_to_rubyxl_worksheet(hash_value, rubyxl_workbook[hash_key])
     end
     rubyxl_workbook
+  end
+
+  def set_hash_worksheet_defaults(hash_worksheet)
+    %i[worksheet columns rows].each do |key|
+      hash_worksheet[key] = {} unless hash_worksheet.has_key?(key)
+    end
   end
 
   def set_hash_worksheet_extents(hash_worksheet)
