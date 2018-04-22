@@ -27,8 +27,8 @@ class Excel
     cells = raw_hash[:cells]
     columns = cells.keys.map { |key| key[/\D+/] }.uniq
     cells.keys.map { |key| key[/\d+/] }.uniq.map do |row_number|
-      columns.each_with_object({}) do |current_hash, column_letter|
-        current_hash[cells["#{column_letter}1"]] = cells["#{column_letter}#{row_number}"][:value]
+      columns.each_with_object({}) do |column_letter, this_hash|
+        this_hash[cells["#{column_letter}1"]] = cells["#{column_letter}#{row_number}"][:value]
       end
     end
   end
