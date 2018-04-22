@@ -23,6 +23,16 @@ class Excel
     end
   end
 
+  def self.hash_worksheet_to_hash_table(raw_hash)
+    cells = raw_hash[:cells]
+    columns = cells.keys.map { |key| key[/^(\S+)\d+$/, 1] }.uniq
+    cells.keys.map { |key| key[/^\S+(\d+)$/, 1] }.uniq.max.map do |row_number|
+      columns.each_with_object({}) do |current_hash, column_letter|
+        current_hash[cells["#{column_letter}1"]] = cells["#{column_letter}#{row_number}"][:value]
+      end
+    end
+  end
+
   def validate_hash_workbook
     raise("@hash_workbook is class '#{@hash_workbook.class}', should be a Hash") unless @hash_workbook.is_a?(Hash)
     @validation = []
