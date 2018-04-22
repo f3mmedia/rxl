@@ -26,8 +26,8 @@ class Excel
   def self.hash_worksheet_to_hash_table(raw_hash)
     cells = raw_hash[:cells]
     columns = cells.keys.map { |key| key[/\D+/] }.uniq
-    cells.keys.map { |key| key[/\d+/] }.uniq.map do |row_number|
-      columns[1..-1].each_with_object({}) do |column_letter, this_hash|
+    cells.keys.map { |key| key[/\d+/] }.uniq[1..-1].map do |row_number|
+      columns.each_with_object({}) do |column_letter, this_hash|
         this_hash[cells["#{column_letter}1"][:value]] = cells["#{column_letter}#{row_number}"][:value]
       end
     end
