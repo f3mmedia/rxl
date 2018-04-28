@@ -3,16 +3,17 @@ require 'rubyXL'
 module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell=nil)
+    rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new : rubyxl_cell.value
     hash_cell = {}
-    hash_cell[:value] = rubyxl_cell.value
+    hash_cell[:value] = rubyxl_cell_value
     hash_cell[:format] = {
         string: 'text',
         fixnum: 'number',
         float: 'number',
         datetime: 'date'
-    }[rubyxl_cell.value.class.to_s.downcase.to_sym]
-    if rubyxl_cell.value.is_a?(Float)
-      hash_cell[:number] = "0.#{'0' * rubyxl_cell.value.to_s[rubyxl_cell.value.to_s.index('.') + 1..-1].length}"
+    }[rubyxl_cell_value.class.to_s.downcase.to_sym]
+    if rubyxl_cell_value.is_a?(Float)
+      hash_cell[:number] = "0.#{'0' * rubyxl_cell_value.to_s[rubyxl_cell_value.to_s.index('.') + 1..-1].length}"
     end
     hash_cell
   end
