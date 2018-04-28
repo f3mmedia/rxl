@@ -3,10 +3,11 @@ require 'rubyXL'
 module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell=nil)
-    rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new : rubyxl_cell.value
+    rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
     hash_cell = {}
     hash_cell[:value] = rubyxl_cell_value
     hash_cell[:format] = {
+        nilclass: 'general',
         string: 'text',
         fixnum: 'number',
         float: 'number',
