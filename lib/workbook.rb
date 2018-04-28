@@ -1,3 +1,5 @@
+require_relative 'worksheet'
+
 module Workbook
 
   def self.rubyxl_workbook_to_hash_workbook(rubyxl_workbook)

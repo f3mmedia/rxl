@@ -1,6 +1,6 @@
 require 'rxl/version'
-require 'excel'
-require 'worksheet'
+require_relative 'excel'
+require_relative 'worksheet'
 
 module Rxl
 

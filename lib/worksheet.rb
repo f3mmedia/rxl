@@ -1,4 +1,5 @@
 require 'rubyXL'
+require_relative 'cell'
 
 module Worksheet
 

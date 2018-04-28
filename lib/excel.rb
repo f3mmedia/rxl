@@ -1,7 +1,7 @@
 require 'rubyXL'
-require 'workbook'
-require 'worksheet'
-require 'cell'
+require_relative 'workbook'
+require_relative 'worksheet'
+require_relative 'cell'
 
 class Excel
   attr_accessor :hash_workbook
