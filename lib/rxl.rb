@@ -15,12 +15,8 @@ module Rxl
   end
 
   def self.read_file_as_tables(filepath)
-    raw_hash = read_file(filepath)
-    processed_hash = {}
-    raw_hash.each do |k, v|
-      processed_hash[k] = Worksheet.hash_worksheet_to_hash_table(v)
-    end
-    processed_hash
+    xl = Excel.new(filepath)
+    xl.hash_workbook_as_tables
   end
 
 end

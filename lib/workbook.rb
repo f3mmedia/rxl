@@ -26,6 +26,12 @@ module Workbook
     rubyxl_workbook
   end
 
+  def self.hash_workbook_to_hash_tables(hash_workbook)
+    hash_workbook.keys.each_with_object({}) do |key, hash_tables|
+      hash_tables[key] = Worksheet.hash_worksheet_to_hash_table(hash_workbook[key])
+    end
+  end
+
   def self.validate_hash_workbook
     raise("@hash_workbook is class '#{@hash_workbook.class}', should be a Hash") unless @hash_workbook.is_a?(Hash)
     @validation = []

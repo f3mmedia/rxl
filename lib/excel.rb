@@ -35,9 +35,13 @@ class Excel
     Workbook.hash_workbook_to_rubyxl_workbook.write(filepath)
   end
 
-  def read_file(path)
-    rubyxl_workbook = RubyXL::Parser.parse(path)
+  def read_file(filepath)
+    rubyxl_workbook = RubyXL::Parser.parse(filepath)
     @hash_workbook = Workbook.rubyxl_to_hash(rubyxl_workbook)
+  end
+
+  def hash_workbook_as_tables
+    Workbook.hash_workbook_to_hash_tables(@hash_workbook)
   end
 
 end
