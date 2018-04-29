@@ -37,7 +37,7 @@ class Excel
 
   def read_file(path)
     rubyxl_workbook = RubyXL::Parser.parse(path)
-    @hash_workbook = Workbook.rubyxl_workbook_to_hash_workbook(rubyxl_workbook)
+    @hash_workbook = Workbook.rubyxl_to_hash(rubyxl_workbook)
   end
 
 end

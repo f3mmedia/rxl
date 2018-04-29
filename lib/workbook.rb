@@ -2,13 +2,10 @@ require_relative 'worksheet'
 
 module Workbook
 
-  def self.rubyxl_workbook_to_hash_workbook(rubyxl_workbook)
+  def self.rubyxl_to_hash(rubyxl_workbook)
     hash_workbook = {}
     rubyxl_workbook.each do |rubyxl_worksheet|
-      hash_worksheet = {row_count: rubyxl_worksheet.count, column_count: 1, rows: {}, columns: {}, cells: {}}
-      Worksheet.rubyxl_worksheet_to_hash_worksheet(rubyxl_worksheet, hash_worksheet)
-      Worksheet.process_sheet_to_populated_block(hash_worksheet)
-      hash_workbook[rubyxl_worksheet.sheet_name] = hash_worksheet
+      hash_workbook[rubyxl_worksheet.sheet_name] = Worksheet.rubyxl_to_hash(rubyxl_worksheet)
     end
     hash_workbook
   end

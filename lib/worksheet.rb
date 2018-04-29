@@ -1,23 +1,37 @@
 require 'rubyXL'
 require_relative 'cell'
+require_relative 'cells'
 
 module Worksheet
 
-  def self.rubyxl_worksheet_to_hash_worksheet(rubyxl_worksheet, hash_worksheet)
-    rubyxl_worksheet.each_with_index do |rubyxl_row, rubyxl_row_index|
-      rubyxl_row_cells = rubyxl_row&.cells
-      if rubyxl_row_cells.nil?
-        hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, 0)
-        hash_worksheet[:rows][hash_cell_key[/\D+/]]
-      else
-        rubyxl_row_cells.each_with_index do |rubyxl_cell, rubyxl_column_index|
-          hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, rubyxl_column_index)
-          hash_worksheet[:cells][hash_cell_key] = Cell.rubyxl_cell_to_hash_cell(rubyxl_cell)
-          hash_worksheet[:column_count] = rubyxl_column_index + 1 if rubyxl_column_index >= hash_worksheet[:column_count]
-        end
-      end
+  ########################################################
+  ###     GET HASH WORKSHEET FROM RUBYXL WORKSHEET     ###
+  ########################################################
+
+  def self.rubyxl_to_hash(rubyxl_worksheet)
+    hash_worksheet = hash_worksheet_template(rubyxl_worksheet.count)
+    rubyxl_rows = rubyxl_worksheet.each_with_index.map do |rubyxl_row, rubyxl_row_index|
+      {rubyxl_row: rubyxl_row, rubyxl_row_index: rubyxl_row_index}
     end
+    Cells.rubyxl_to_hash(rubyxl_rows, hash_worksheet)
+    process_sheet_to_populated_block(hash_worksheet)
+    hash_worksheet
   end
+
+  def self.hash_worksheet_template(rubyxl_worksheet_row_count)
+    {
+        row_count: rubyxl_worksheet_row_count,
+        column_count: 1,
+        rows: {},
+        columns: {},
+        cells: {}
+    }
+  end
+
+
+  ########################################################
+  ###     GET RUBYXL WORKSHEET FROM HASH WORKSHEET     ###
+  ########################################################
 
   def self.hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
     Worksheet.process_sheet_to_populated_block(hash_worksheet)
@@ -28,6 +42,11 @@ module Worksheet
       Cell.hash_cell_to_rubyxl_cell(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
     end
   end
+
+
+  ##############################
+  ###     SHARED METHODS     ###
+  ##############################
 
   def self.process_sheet_to_populated_block(hash_worksheet)
     Worksheet.set_hash_worksheet_extents(hash_worksheet)
@@ -50,6 +69,11 @@ module Worksheet
       hash_worksheet[:column_count] = column_index + 1 if column_index >= hash_worksheet[:column_count]
     end
   end
+
+
+  ####################################
+  ###     OTHER PUBLIC METHODS     ###
+  ####################################
 
   def self.set_hash_worksheet_defaults(hash_worksheet)
     %i[worksheet columns rows].each do |key|
