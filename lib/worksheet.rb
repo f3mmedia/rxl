@@ -91,8 +91,10 @@ module Worksheet
     end
   end
 
-  def self.validate_hash_worksheet(hash_worksheet_name, hash_worksheet)
-    @validation << "hash_worksheet_name is class '#{hash_worksheet_name.class}', should be a String" unless hash_worksheet_name.is_a?(String)
+  def self.validate_hash_worksheet(validation, hash_worksheet_name, hash_worksheet)
+    unless hash_worksheet_name.is_a?(String)
+      validation << "hash_worksheet key is class '#{hash_worksheet_name.class}', should be a String"
+    end
     # other validation...
   end
 
