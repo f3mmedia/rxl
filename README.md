@@ -28,25 +28,21 @@ Or install it yourself as:
 
 ## Usage
 
+With some exceptions (due mainly to the vagaries of Excel) a file can be read in and the resulting hash passed to the write method to save a duplicate of the original.
+
+### Read from file
+
 To read a file to hash simply pass the filepath:
 
 ```ruby
 Rxl.read_file('path/to/file.xlxs')
 ```
 
-To write a file pass the filename and hash:
-
-```ruby
-Rxl.write_file('path/to/save.xlsx', write_hash)
-```
-
-With some exceptions (due mainly to the vagaries of Excel) a file can be read in and the resulting hash passed to the write method to save a duplicate of the original.
-
-The format of the excel hash has the following skeleton:
+The format of the excel read hash has the following skeleton:
 
 ```ruby
 {
-  "Sheet1" => {
+    "Sheet1" => {
       row_count: 1,
       column_count: 1,
       rows: {},
@@ -57,9 +53,58 @@ The format of the excel hash has the following skeleton:
               format: 'text'
           }
       }
-  }
+    }
 }
 ```
+
+### Write to file
+
+To write a file pass the filename and hash:
+
+```ruby
+Rxl.write_file('path/to/save.xlsx', write_hash)
+```
+
+The format of the excel write hash must contain at least the following skeleton:
+
+```ruby
+{
+    "Sheet1" => {
+      cells: {
+          'A1' => {
+              value: 'abc',
+              format: 'text'
+          }
+      }
+    }
+}
+```
+
+### Read tables from file
+
+To read a file where the data is in table format - headers and values, no totals or otherwise extra content:
+
+```ruby
+Rxl.read_file_as_tables('path/to/file.xlsx')
+```
+
+The format of the excel table read hash has the following skeleton:
+
+```ruby
+{
+    "Sheet1" => [
+      {
+          header_a: value,
+          header_b: value
+      },
+      {
+          header_a: value,
+          header_b: value
+      },
+    ]
+}
+```
+
 
 TODO: Add further detail
 
