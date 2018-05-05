@@ -1,51 +1,50 @@
-module ExcelSpecHelpers
+module RxlSpecHelpers
 
-  def create_temp_xlsx_dir_unless_exists
+  def self.create_temp_xlsx_dir_unless_exists
     path = Pathname.new(ENV['TEMP_XLSX_PATH'])
     FileUtils.mkdir(path.to_s) unless path.exist?
   end
 
-  def destroy_temp_xlsx_dir_if_exists
+  def self.destroy_temp_xlsx_dir_if_exists
     path = Pathname.new(ENV['TEMP_XLSX_PATH'])
     FileUtils.rmtree(path.to_s) if path.exist?
   end
 
-  def generate_test_excel_file_to_spec(spec)
-    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{spec_to_filename(spec)}"
-    file = Excel.new(source: spec_to_write_hash(spec))
-    file.save_file(filepath)
+  def self.generate_test_excel_file(test, key)
+    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{test_filenames(key)}"
+    Rxl.write_file(filepath, write_hash(key))
     path = Pathname.new(filepath)
-    expect(path.exist?)
+    test.expect(path.exist?)
   end
 
-  def verify_read_hash_matches_expected(spec)
-    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{spec_to_filename(spec)}"
-    file = Excel.new(source: filepath)
-    expect(file.hash_workbook).to eq(spec_to_test_hash(spec))
+  def self.verify_read_hash_matches_expected(test, key)
+    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{test_filenames(key)}"
+    read_hash = Rxl.read_file(filepath)
+    test.expect(read_hash).to test.eq(expected_hash(key))
   end
 
-  def spec_to_filename(spec)
+  def self.test_filenames(key)
     {
         empty_xlsx: 'empty_file_test.xlsx',
         sheet_names_xlsx: 'sheet_names_test.xlsx'
-    }[spec]
+    }[key]
   end
 
-  def spec_to_write_hash(spec)
+  def self.write_hash(key)
     {
         empty_xlsx: {},
         sheet_names_xlsx: {'test_a' => {}, 'test_b' => {}}
-    }[spec]
+    }[key]
   end
 
-  def spec_to_test_hash(spec)
+  def self.expected_hash(key)
     {
         empty_xlsx: {'Sheet1'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}}},
         sheet_names_xlsx: {
             'test_a'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}},
             'test_b'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}}
         }
-    }[spec]
+    }[key]
   end
 
 end
