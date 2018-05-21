@@ -11,40 +11,112 @@ module RxlSpecHelpers
   end
 
   def self.generate_test_excel_file(test, key)
-    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{test_filenames(key)}"
-    Rxl.write_file(filepath, write_hash(key))
+    filepath = test_data(:filename, key)
+    Rxl.write_file(filepath, test_data(:write_hash, key))
     path = Pathname.new(filepath)
     test.expect(path.exist?)
   end
 
-  def self.verify_read_hash_matches_expected(test, key)
-    filepath = "#{ENV['TEMP_XLSX_PATH']}/#{test_filenames(key)}"
-    read_hash = Rxl.read_file(filepath)
-    test.expect(read_hash).to test.eq(expected_hash(key))
-  end
-
-  def self.test_filenames(key)
-    {
-        empty_xlsx: 'empty_file_test.xlsx',
-        sheet_names_xlsx: 'sheet_names_test.xlsx'
-    }[key]
-  end
-
-  def self.write_hash(key)
-    {
-        empty_xlsx: {},
-        sheet_names_xlsx: {'test_a' => {}, 'test_b' => {}}
-    }[key]
-  end
-
-  def self.expected_hash(key)
-    {
-        empty_xlsx: {'Sheet1'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}}},
-        sheet_names_xlsx: {
-            'test_a'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}},
-            'test_b'=>{row_count: 0, column_count: 0, rows: {}, columns: {}, cells: {}}
-        }
-    }[key]
+  def self.test_data(type, key)
+    temp_xlsx_path = ENV['TEMP_XLSX_PATH']
+    return_value = {
+      filename: {
+          empty_file: "#{temp_xlsx_path}/empty_file.xlsx",
+          worksheet_names: "#{temp_xlsx_path}/worksheet_names.xlsx",
+          cell_values_and_formats: 'spec/support/static_test_files/cell_values_and_formats.xlsx'
+      }[key],
+      write_hash: {
+          empty_file: {},
+          worksheet_names: {'test_a' => {}, 'test_b' => {}}
+      }[key],
+      expected_hash: {
+        empty_file: {'Sheet1'=>{rows: {}, columns: {}, cells: {}}},
+        worksheet_names: {
+            'test_a' => {rows: {}, columns: {}, cells: {}},
+            'test_b' => {rows: {}, columns: {}, cells: {}}
+        },
+        cell_raw_string_read: {
+            'B2' => {value: 'abcde', format: :text, formula: nil},
+            'B3' => {value: 'abcde', format: :text, formula: nil},
+            'B4' => {value: 'abcde', format: :text, formula: nil},
+            'B5' => {value: 'abcde', format: :text, formula: nil},
+            'B6' => {value: 'abcde', format: :text, formula: nil},
+            'B7' => {value: 'abcde', format: :text, formula: nil}
+        },
+        cell_raw_number_read: {
+            'B2' => {value: 12345, format: :number, formula: nil},
+            'B3' => {value: '12345', format: :text, formula: nil},
+            'B4' => {value: 12345, format: :number, formula: nil}
+        },
+        cell_raw_float_read: {
+            'B3' => {value: '123.45', format: :text, formula: nil},
+            'B4' => {value: 123.45, format: :number, formula: nil}
+        },
+        cell_raw_date_read: {
+            'B3' => {value: '01/01/2000', format: :text, formula: nil},
+            'B5' => {value: DateTime.parse('01/01/2000'), format: :date, formula: nil},
+            'B6' => {value: DateTime.parse('01/01/2000'), format: :date, formula: nil},
+            'B7' => {value: '01/01/2000%', format: :text, formula: nil}
+        },
+        cell_raw_time_read: {
+            'B3' => {value: '10:15:30', format: :text, formula: nil},
+            'B6' => {value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: nil},
+            'B7' => {value: '10:15:30%', format: :text, formula: nil}
+        },
+        cell_raw_percentage_read: {
+            'B3' => {value: '100%', format: :text, formula: nil},
+            'B7' => {value: 1, format: :number, formula: nil}
+        },
+        cell_raw_percentage_float_read: {
+            'B3' => {value: '123.45%', format: :text, formula: nil},
+            'B7' => {value: 1.2345, format: :number, formula: nil}
+        },
+        cell_raw_empty_read: {
+            'B2' => {value: nil, format: :general, formula: nil},
+            'B3' => {value: nil, format: :general, formula: nil},
+            'B4' => {value: nil, format: :general, formula: nil},
+            'B5' => {value: nil, format: :general, formula: nil},
+            'B6' => {value: nil, format: :general, formula: nil},
+            'B7' => {value: nil, format: :general, formula: nil}
+        },
+        cell_formula_string_read: {
+            'C2' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
+            'C3' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
+            'C4' => {value: 'abcde', format: :text, formula: nil},
+            'C5' => {value: 'abcde', format: :text, formula: nil},
+            'C6' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
+            'C7' => {value: 'abcde', format: :text, formula: nil}
+        },
+        cell_formula_number_read: {
+            'C2' => {value: 12345, format: :number, formula: '12340+5'},
+            'C3' => {value: '=12340+5', format: :text, formula: nil},
+            'C4' => {value: 12345, format: :number, formula: '12340+5'}
+        },
+        cell_formula_float_read: {
+            'C3' => {value: '=123.41+0.04', format: :text, formula: nil},
+            'C4' => {value: 123.45, format: :number, formula: '123.41+0.04'}
+        },
+        cell_formula_date_read: {
+            'C3' => {value: '=DATE(2000,1,1)', format: :text, formula: nil},
+            'C5' => {value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)'},
+            'C6' => {value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)'}
+        },
+        cell_formula_time_read: {
+            'C3' => {value: '=TIME(10,15,30)', format: :text, formula: nil},
+            'C6' => {value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: 'TIME(10,15,30)'}
+        },
+        cell_formula_percentage_read: {
+            'C3' => {value: '=50%+50%', format: :text, formula: nil},
+            'C7' => {value: 1, format: :number, formula: '50%+50%'}
+        },
+        cell_formula_percentage_float_read: {
+            'C3' => {value: '=123.41%+0.04%', format: :text, formula: nil},
+            'C7' => {value: 1.2345, format: :number, formula: '123.41%+0.04%'}
+        },
+      }[key]
+    }[type]
+    raise "no value found for type :#{type} and key :#{key}" unless return_value
+    return_value
   end
 
 end
