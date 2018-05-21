@@ -1,4 +1,5 @@
 require 'rubyXL'
+require 'mitrush'
 require_relative 'cell'
 require_relative 'cells'
 
@@ -15,6 +16,7 @@ module Worksheet
     end
     Cells.rubyxl_to_hash(rubyxl_rows, hash_worksheet)
     process_sheet_to_populated_block(hash_worksheet)
+    Mitrush.delete_keys(hash_worksheet, %i[row_count column_count])
     hash_worksheet
   end
 
