@@ -57,28 +57,20 @@ The format of the excel read hash has the following skeleton:
 }
 ```
 
-### Write to file
+Bear in mind the limitations of reading cell formats. Everything is read as a string other than:
+* cells formatted as dates are converted to a DateTime object with the time portion set to midnight
+* cells formatted as times are converted to a DateTime object with the date portion set to 31/12/1899 - unless the cell has a date prefix in which case this is carried in (this will be read as a date format as per below parsing rules)
+* numbers (including floats and percentages) where the cell format is number or percentage are read in as integers - trailing zeroes are cropped from floats in this case and percentages are converted to numeric format (eg 100% = 1)
+* formulas are not read from cells with date and time formats
 
-To write a file pass the filename and hash:
+Within these limitations the cell hash's :format holds the best analysis of the original cell format but as there's no way to extract all of the format information directly from the sheet some information may need to be refurbished as required after import via Rxl.
 
-```ruby
-Rxl.write_file('path/to/save.xlsx', write_hash)
-```
+Further to the above, these rules are applied by Rxl when parsing cells:
+* strings are given text format
+* DateTime objects are given date format except where the date is 31/12/1899 in which case they are given time format
 
-The format of the excel write hash must contain at least the following skeleton:
 
-```ruby
-{
-    "Sheet1" => {
-      cells: {
-          'A1' => {
-              value: 'abc',
-              format: 'text'
-          }
-      }
-    }
-}
-```
+
 
 ### Read tables from file
 
@@ -104,6 +96,68 @@ The format of the excel table read hash has the following skeleton:
     ]
 }
 ```
+
+### Write to file
+
+To write a file pass the filename and hash:
+
+```ruby
+Rxl.write_file('path/to/save.xlsx', hash_workbook)
+```
+
+The format of the excel hash_workbook must contain at least the following skeleton:
+
+```ruby
+{
+    "Sheet1" => {
+      cells: {
+          'A1' => {
+              value: 'abc',
+              format: 'text'
+          }
+      }
+    }
+}
+```
+
+#### Cell specification
+
+All cells are written with the format set to general except those with a number format specified
+
+Specify the number format according to https://support.office.com/en-us/article/number-format-codes-5026bbd6-04bc-48cd-bf33-80f18b4eae68?ui=en-US&rs=en-US&ad=US
+
+Examples:
+
+| value        | number format | resulting cell format | resulting cell value |
+|--------------|---------------|-----------------------|----------------------|
+| 0            | 0             | number                | 0                    |
+| 0.49         | 0             | number                | 0                    |
+| 0.5          | 0             | number                | 1                    |
+| 0            | 0.00          | number                | 0.00                 |
+| 0            | 0%            | percentage            | 0%                   |
+| 1            | 0%            | percentage            | 100%                 |
+| '01/01/2000' | 'dd/mm/yyyy'  | date                  | 01/01/2000           |
+
+#### Write Validation
+
+The following rules are validated for write_file:
+
+* The hash_workbook must be a hash (NB if empty a blank file will be created with a single sheet called "Sheet1")
+* The hash_workbook keys must be strings
+* The hash_workbook values (hash_worksheet) must be hashes
+
+
+* The hash_worksheet keys must be symbols
+* The following keys are allowed for hash_worksheet: :cells, :rows, :columns
+* The hash_worksheet values must be arrays - those arrays must contain only hashes
+
+
+* The arrays' child hash keys must be strings of valid Excel cell id format (or stringified number for a row, capitalised alpha for a column)
+* The arrays' child hash values must be hashes (hash_cell)
+* The hash_cell keys must conform the the cell specification as below
+
+* If a formula is provided the value must be nil or an empty string
+* If a number format is provided the value must be consistent with it
 
 
 TODO: Add further detail
