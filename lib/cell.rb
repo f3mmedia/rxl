@@ -10,25 +10,25 @@ module Cell
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
     {
         value: rubyxl_cell_value,
-        format: hash_cell_format(rubyxl_cell_value)
+        format: hash_cell_format(rubyxl_cell_value),
+        formula: extract_cell_formula(rubyxl_cell)
     }
+  end
+
+  def self.extract_cell_formula(rubyxl_cell)
+    return nil if rubyxl_cell.nil? || rubyxl_cell.formula.nil? || rubyxl_cell.formula.expression.empty?
+    rubyxl_cell.formula.expression
   end
 
   def self.hash_cell_format(rubyxl_cell_value)
     format = {
-        nilclass: 'general',
-        string: 'text',
-        fixnum: 'number',
-        float: 'number',
-        datetime: 'date',
+        nilclass: :general,
+        string: :text,
+        fixnum: :number,
+        float: :number,
+        datetime: :date,
     }[rubyxl_cell_value.class.to_s.downcase.to_sym]
-    format[:number] = hash_cell_float_format(rubyxl_cell_value) if rubyxl_cell_value.is_a?(Float)
-    format
-  end
-
-  def self.hash_cell_float_format(rubyxl_cell_value)
-    decimal_point_index = rubyxl_cell_value.to_s.index('.') + 1
-    "0.#{'0' * rubyxl_cell_value.to_s[decimal_point_index..-1].length}"
+    format == :date && rubyxl_cell_value.strftime('%Y%m%d') == '18991231' ? :time : format
   end
 
 
