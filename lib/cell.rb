@@ -93,15 +93,15 @@ module Cell
     case type
       when :cells
         unless cell_id[/^\D+\d+$/]
-          raise "hash_cell key at path [#{trace}] of type cell has invalid key: #{cell_id}, must be capitalised alpha(s) and numeric (eg AB123)"
+          raise "hash_cell key at path #{trace} of type cell has invalid key: #{cell_id}, must be capitalised alpha(s) and numeric (eg AB123)"
         end
       when :columns
         unless cell_id[/^\D+$/]
-          raise "hash_cell key at path [#{trace}] of type column has invalid key: #{cell_id}, must be capitalised alpha only (eg AB)"
+          raise "hash_cell key at path #{trace} of type column has invalid key: #{cell_id}, must be capitalised alpha only (eg AB)"
         end
       when :rows
         unless cell_id[/^\d+$/]
-          raise "hash_cell key at path [#{trace}] of type row has invalid key: #{cell_id}, must be stringified integer only (eg 123)"
+          raise "hash_cell key at path #{trace} of type row has invalid key: #{cell_id}, must be stringified integer only (eg 123)"
         end
     end
   end
