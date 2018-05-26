@@ -95,14 +95,14 @@ module Worksheet
 
   def self.validate_hash_worksheet(hash_worksheet_name, hash_worksheet, trace)
     unless hash_worksheet_name.is_a?(String)
-      raise 'hash_worksheet key must be a String'
+      raise 'worksheet name must be a String'
     end
     unless hash_worksheet.is_a?(Hash)
-      raise "hash_worksheet value at path #{trace} must be a Hash"
+      raise "worksheet value at path #{trace} must be a Hash"
     end
     unauthorised_keys = Mitrush.delete_keys(hash_worksheet.dup, %i[cells columns rows])
     unless unauthorised_keys.empty?
-      raise "hash_worksheet at path #{trace} contains unauthorised key(s): #{unauthorised_keys.join(', ')}"
+      raise "worksheet at path #{trace} contains unauthorised key(s): #{unauthorised_keys.join(', ')}"
     end
     hash_worksheet.each do |type, cells_hash|
       unless cells_hash.is_a?(Hash)

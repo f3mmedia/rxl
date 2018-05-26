@@ -84,7 +84,7 @@ module Cell
   def self.validate_hash_cell(type, cell_id, hash_cell, trace)
     validate_cell_id(type, cell_id, trace)
     unless hash_cell.is_a?(Hash)
-      raise("hash_cell at path [#{trace + [cell_id]}] is class #{hash_cell.class}, must be a Hash")
+      raise("cell at path [#{trace + [cell_id]}] is class #{hash_cell.class}, must be a Hash")
     end
     # TODO: add validation for hash_cell specification
   end
@@ -93,15 +93,15 @@ module Cell
     case type
       when :cells
         unless cell_id[/^\D+\d+$/]
-          raise "hash_cell key at path #{trace} of type cell has invalid key: #{cell_id}, must be capitalised alpha(s) and numeric (eg AB123)"
+          raise "cell key at path #{trace} of type cell has invalid key: #{cell_id}, must be capitalised alpha(s) and numeric (eg AB123)"
         end
       when :columns
         unless cell_id[/^\D+$/]
-          raise "hash_cell key at path #{trace} of type column has invalid key: #{cell_id}, must be capitalised alpha only (eg AB)"
+          raise "cell key at path #{trace} of type column has invalid key: #{cell_id}, must be capitalised alpha only (eg AB)"
         end
       when :rows
         unless cell_id[/^\d+$/]
-          raise "hash_cell key at path #{trace} of type row has invalid key: #{cell_id}, must be stringified integer only (eg 123)"
+          raise "cell key at path #{trace} of type row has invalid key: #{cell_id}, must be stringified integer only (eg 123)"
         end
     end
   end
