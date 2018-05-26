@@ -143,8 +143,9 @@ describe Rxl do
           ('a'..'dd').map { |id| "worksheet_#{id}" }
       ]
       worksheet_name_arrays.each do |worksheet_name_array|
-        hash_workbook_input = {}
-        worksheet_name_array.each { |worksheet_name| hash_workbook_input[worksheet_name] = {} }
+        hash_workbook_input = worksheet_name_array.each_with_object({}) do |worksheet_name, hash|
+          hash[worksheet_name] = {}
+        end
         Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file), hash_workbook_input)
         read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file))
         expect(read_hash.keys.length).to eq(worksheet_name_array.length)
@@ -159,12 +160,38 @@ describe Rxl do
     # see the manual_tests directory for the raw ruby
     # hashes and expected outcomes for writing each with Rxl
 
-    it 'returns an exception where the hash_workbook is not a hash' do
-      hash_workbook_inputs = [nil, '', 'abc', 0, [], ['a', 'b', 'c'], [1, 2, 3], {}.to_json]
-      hash_workbook_inputs.each do |hash_workbook_input|
-        exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-        expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_hash_workbook))
+    context 'it returns an exception where' do
+
+      context 'the hash_workbook is not a hash' do
+        hash_workbook_inputs = [nil, true, false, '', 'abc', 0, [], ['a', 'b', 'c'], [1, 2, 3], {}.to_json]
+        hash_workbook_inputs.each_with_index do |hash_workbook_input, i|
+          it "[example ##{i}]" do
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_hash_workbook))
+          end
+        end
       end
+
+      context 'the hash_workbook contains non-string keys' do
+        key_arrays = [
+            [:worksheet_a],
+            ['worksheet_a', :worksheet_b],
+            [0, 'worksheet_b'],
+            ['worksheet_a', nil],
+            [[], 'worksheet_b'],
+            ['worksheet_a', {}],
+            [true, 'worksheet_b'],
+            ['worksheet_a', false]
+        ]
+        key_arrays.each_with_index do |key_array, i|
+          it "[example ##{i}]" do
+            hash_workbook_input = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_string_worksheet_name))
+          end
+        end
+      end
+
     end
 
   end

@@ -111,7 +111,8 @@ module RxlSpecHelpers
         },
       }[key],
       validation: {
-        non_hash_workbook: 'hash_workbook must be a Hash'
+        non_hash_workbook: 'hash_workbook must be a Hash',
+        non_string_worksheet_name: 'worksheet name must be a String'
       }[key]
     }[type]
     raise "no value found for type :#{type} and key :#{key}" unless return_value
