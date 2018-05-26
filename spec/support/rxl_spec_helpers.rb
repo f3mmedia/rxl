@@ -11,7 +11,7 @@ module RxlSpecHelpers
   end
 
   def self.generate_test_excel_file(test, key)
-    filepath = test_data(:filename, key)
+    filepath = test_data(:filepath, key)
     Rxl.write_file(filepath, test_data(:write_hash, key))
     path = Pathname.new(filepath)
     test.expect(path.exist?)
