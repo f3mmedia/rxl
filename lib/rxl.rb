@@ -5,7 +5,11 @@ require_relative 'workbook'
 module Rxl
 
   def self.write_file(filepath, hash_workbook)
-    rubyxl_workbook = Workbook.hash_workbook_to_rubyxl_workbook(hash_workbook)
+    begin
+      rubyxl_workbook = Workbook.hash_workbook_to_rubyxl_workbook(hash_workbook)
+    rescue => e
+      return e
+    end
     rubyxl_workbook.write(filepath)
   end
 
