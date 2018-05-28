@@ -128,4 +128,133 @@ module RxlSpecHelpers
     filepath || "#{xlsx_path}/#{key}.xlsx"
   end
 
+  def self.raw_cell_value_test_data_hash
+    {
+      cell_raw_string_read: {
+        worksheet_name: 'string',
+        cell_range: /^B[2-7]$/,
+        description: 'with string input as String :text regardless of number format'
+      },
+      cell_raw_number_read: {
+        worksheet_name: 'number',
+        cell_range: /^B[2-4]$/,
+        description: 'with whole number input as String :text for text number format, as FixNum :number for general/number number formats'
+      },
+      cell_raw_float_read: {
+        worksheet_name: 'float',
+        cell_range: /^B[3-4]$/,
+        description: 'with float input as String :text for text number format, as FixNum :number for number number format'
+      },
+      cell_raw_date_read: {
+        worksheet_name: 'date',
+        cell_range: /^B(3|[5-7])$/,
+        description: 'with date input as String :text for text/percentage format, as DateTime :date for time/date number formats'
+      },
+      cell_raw_time_read: {
+        worksheet_name: 'time',
+        cell_range: /^B(3|[6-7])$/,
+        description: 'with time input as String :text for text/percentage format, as DateTime :time for time number format'
+      },
+      cell_raw_percentage_read: {
+        worksheet_name: 'percentage',
+        cell_range: /^B(3|7)$/,
+        description: 'with percentage input as String :text for text format, as FixNum :number for percentage number format'
+      },
+      cell_raw_percentage_float_read: {
+        worksheet_name: 'percentage_float',
+        cell_range: /^B(3|7)$/,
+        description: 'with percentage float input as String :text for text format, as Float :number for percentage number format'
+      },
+      cell_raw_empty_read: {
+        worksheet_name: 'empty',
+        cell_range: /^B[2-7]$/,
+        description: 'with empty input as NilClass :general regardless of number format'
+      }
+    }
+  end
+
+  def self.formula_cell_value_test_data_hash
+    {
+      cell_formula_string_read: {
+        worksheet_name: 'string',
+        cell_range: /^C[2-7]$/,
+        description: 'with string result as String :text regardless of number format, and collects formula'
+      },
+      cell_formula_number_read: {
+        worksheet_name: 'number',
+        cell_range: /^C[2-4]$/,
+        description: 'with whole number result as String :text for text number format, as FixNum :number for general/number number formats, and collects formula'
+      },
+      cell_formula_float_read: {
+        worksheet_name: 'float',
+        cell_range: /^C[3-4]$/,
+        description: 'with float result as String :text for text number format, as FixNum :number for number number format, and collects formula'
+      },
+      cell_formula_date_read: {
+        worksheet_name: 'date',
+        cell_range: /^C(3|5|6)$/,
+        description: 'with date result as String :text for text number format, as DateTime :date for time/date number formats, and collects formula'
+      },
+      cell_formula_time_read: {
+        worksheet_name: 'time',
+        cell_range: /^C(3|6)$/,
+        description: 'with time result as String :text for text format, as DateTime :time for time number format, and collects formula'
+      },
+      cell_formula_percentage_read: {
+        worksheet_name: 'percentage',
+        cell_range: /^C(3|7)$/,
+        description: 'with percentage result as String :text for text format, as FixNum :number for percentage number format, and collects formula'
+      },
+      cell_formula_percentage_float_read: {
+        worksheet_name: 'percentage_float',
+        cell_range: /^C(3|7)$/,
+        description: 'with percentage float result as String :text for text format, as Float :number for percentage number format, and collects formula'
+      }
+    }
+  end
+
+  def self.read_and_test_cell_values(test, expected_key, worksheet_name, cell_range)
+    read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats))
+    cell_range = read_hash[worksheet_name][:cells].select { |key, _| key[cell_range] }
+    test.expect(cell_range).to test.eq(RxlSpecHelpers.test_data(:expected_hash, expected_key))
+  end
+
+  def self.non_string_key_arrays
+    [
+      [:worksheet_a],
+      ['worksheet_a', :worksheet_b],
+      [0, 'worksheet_b'],
+      ['worksheet_a', nil],
+      [[], 'worksheet_b'],
+      ['worksheet_a', {}],
+      [true, 'worksheet_b'],
+      ['worksheet_a', false]
+    ]
+  end
+
+  def self.non_hash_values
+    [
+      nil,
+      true,
+      false,
+      '',
+      'abc',
+      0,
+      [],
+      %w[a b c],
+      [1, 2, 3],
+      {}.to_json
+    ]
+  end
+
+  def self.invalid_key_worksheets
+    [
+      { invalid: {} },
+      { 'rows' => {} },
+      { 'columns' => {} },
+      { 'cells' => {} },
+      { rows: {}, columns: {}, cells: {}, invalid: {} }
+    ]
+  end
+
 end
