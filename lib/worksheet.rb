@@ -102,7 +102,7 @@ module Worksheet
     end
     unauthorised_keys = Mitrush.delete_keys(hash_worksheet.dup, %i[cells columns rows])
     unless unauthorised_keys.empty?
-      raise "worksheet at path #{trace} contains unauthorised key(s): #{unauthorised_keys.join(', ')}"
+      raise "worksheet at path #{trace} contains unauthorised key(s)"
     end
     hash_worksheet.each do |type, cells_hash|
       unless cells_hash.is_a?(Hash)
