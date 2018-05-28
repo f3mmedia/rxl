@@ -21,20 +21,20 @@ describe Rxl do
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :worksheet_names))
       expect(read_hash).to eq(RxlSpecHelpers.test_data(:expected_hash, :worksheet_names))
     end
-  end
 
-  context 'reads cell raw values' do
-    RxlSpecHelpers.raw_cell_value_test_data_hash.each do |expected_key, value_hash|
-      it value_hash[:description] do
-        RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+    context 'reads cell raw values' do
+      RxlSpecHelpers.raw_cell_value_test_data_hash.each do |expected_key, value_hash|
+        it value_hash[:description] do
+          RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+        end
       end
     end
-  end
 
-  context 'reads cell formula values' do
-    RxlSpecHelpers.formula_cell_value_test_data_hash.each do |expected_key, value_hash|
-      it value_hash[:description] do
-        RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+    context 'reads cell formula values' do
+      RxlSpecHelpers.formula_cell_value_test_data_hash.each do |expected_key, value_hash|
+        it value_hash[:description] do
+          RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+        end
       end
     end
   end
@@ -100,17 +100,20 @@ describe Rxl do
           it "[example ##{i + 1}]" do
             filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
             exception = Rxl.write_file(filepath, {'worksheet_a' => worksheet_input})
-            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_hash_worksheet))
+            expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_worksheet, path: ['worksheet_a'])
+            expect(exception.message).to eq(expected_message)
           end
         end
       end
 
-      context 'the worksheet contains keys other than :rows, :columns and :cells' do
-        RxlSpecHelpers.invalid_key_worksheets.each_with_index do |worksheet_hash, i|
+      context 'the worksheet contains keys that are not valid excel cell keys' do
+        RxlSpecHelpers.invalid_string_cell_keys.each_with_index do |key, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = {'worksheet_a' => worksheet_hash}
+            hash_workbook_input = {'worksheet_a' => {key => {}}}
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :invalid_worksheet_keys))
+            expect(exception.class).to eq(RuntimeError)
+            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_keys, path: ['worksheet_a', key])
+            expect(exception.message).to eq(expected_message)
           end
         end
       end

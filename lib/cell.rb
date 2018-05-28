@@ -81,29 +81,23 @@ module Cell
   ###     VALIDATE HASH CELL     ###
   ##################################
 
-  def self.validate_hash_cell(type, cell_id, hash_cell, trace)
-    validate_cell_id(type, cell_id, trace)
+  def self.validate_hash_cell(hash_cell_key, hash_cell, trace)
+    unless validate_cell_key(hash_cell_key)
+      raise(%[invalid cell key at path #{trace}, must be String and in Excel format (eg "A1")])
+    end
     unless hash_cell.is_a?(Hash)
-      raise("cell at path [#{trace + [cell_id]}] is class #{hash_cell.class}, must be a Hash")
+      raise("cell at path [#{trace + [hash_cell_key]}] is class #{hash_cell.class}, must be a Hash")
     end
     # TODO: add validation for hash_cell specification
   end
 
-  def self.validate_cell_id(type, cell_id, trace)
-    case type
-      when :cells
-        unless cell_id[/^\D+\d+$/]
-          raise "cell key at path #{trace} of type cell has invalid key: #{cell_id}, must be capitalised alpha(s) and numeric (eg AB123)"
-        end
-      when :columns
-        unless cell_id[/^\D+$/]
-          raise "cell key at path #{trace} of type column has invalid key: #{cell_id}, must be capitalised alpha only (eg AB)"
-        end
-      when :rows
-        unless cell_id[/^\d+$/]
-          raise "cell key at path #{trace} of type row has invalid key: #{cell_id}, must be stringified integer only (eg 123)"
-        end
-    end
+  def self.validate_cell_key(cell_key)
+    return false unless cell_key.is_a?(String)
+    return false unless cell_key[/^[A-Z]{1,3}[0-9]{1,7}$/]
+    cell_index = RubyXL::Reference.ref2ind(cell_key)
+    return false unless cell_index[0].between?(0, 1_048_575)
+    return false unless cell_index[0].between?(0, 16383)
+    true
   end
 
 end

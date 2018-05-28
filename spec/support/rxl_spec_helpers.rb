@@ -17,7 +17,7 @@ module RxlSpecHelpers
     test.expect(path.exist?)
   end
 
-  def self.test_data(type, key)
+  def self.test_data(type, key, args = {})
     temp_xlsx_path = ENV['TEMP_XLSX_PATH']
     return_value = {
       filepath: derived_filepath(key, temp_xlsx_path),
@@ -113,11 +113,11 @@ module RxlSpecHelpers
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
         non_string_worksheet_name: 'worksheet name must be a String',
-        non_hash_worksheet: 'worksheet value at path ["worksheet_a"] must be a Hash',
-        invalid_worksheet_keys: 'worksheet at path ["worksheet_a"] contains unauthorised key(s)'
+        non_hash_worksheet: "worksheet value at path #{args[:path]} must be a Hash",
+        invalid_cell_keys: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")]
       }[key]
     }[type]
-    raise "no value found for type :#{type} and key :#{key}" unless return_value
+    raise("no value found for type :#{type} and key :#{key}") unless return_value
     return_value
   end
 
@@ -239,6 +239,7 @@ module RxlSpecHelpers
       false,
       '',
       'abc',
+      :cells,
       0,
       [],
       %w[a b c],
@@ -247,14 +248,42 @@ module RxlSpecHelpers
     ]
   end
 
-  def self.invalid_key_worksheets
+  def self.non_string_values
     [
-      { invalid: {} },
-      { 'rows' => {} },
-      { 'columns' => {} },
-      { 'cells' => {} },
-      { rows: {}, columns: {}, cells: {}, invalid: {} }
+      nil,
+      true,
+      false,
+      :cells,
+      0,
+      [],
+      %w[a b c],
+      [1, 2, 3],
+      {},
+      {}.to_json
     ]
+  end
+
+  def self.invalid_string_cell_keys
+    keys = %w[
+      !
+      A!
+      !1
+      1A
+      aaa
+      A
+      ZZZ
+      0
+      1234
+      123a
+      123A
+      1a2
+      1A2
+      a1a
+      A1A
+      AAAA1
+      A11111111
+    ]
+    keys + %i[invalid A1]
   end
 
 end
