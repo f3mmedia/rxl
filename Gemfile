@@ -5,4 +5,5 @@ gemspec
 
 gem 'awesome_print'
 gem 'mitrush'
+gem 'rubocop'
 gem 'rubyXL'
