@@ -111,8 +111,9 @@ module RxlSpecHelpers
         },
       }[key],
       validation: {
-        non_hash_workbook: 'hash_workbook must be a Hash',
+        non_hash_workbook: 'workbook must be a Hash',
         non_string_worksheet_name: 'worksheet name must be a String',
+        non_hash_worksheet: 'worksheet value at path ["worksheet_a"] must be a Hash',
         invalid_worksheet_keys: 'worksheet at path ["worksheet_a"] contains unauthorised key(s)'
       }[key]
     }[type]
