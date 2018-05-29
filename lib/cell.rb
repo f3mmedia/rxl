@@ -86,7 +86,7 @@ module Cell
       raise(%[invalid cell key at path #{trace}, must be String and in Excel format (eg "A1")])
     end
     unless hash_cell.is_a?(Hash)
-      raise("cell at path [#{trace + [hash_cell_key]}] is class #{hash_cell.class}, must be a Hash")
+      raise("cell value at path #{trace + [hash_cell_key]} must be a Hash")
     end
     # TODO: add validation for hash_cell specification
   end

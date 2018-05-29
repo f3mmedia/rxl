@@ -123,10 +123,22 @@ describe Rxl do
       context 'the worksheet contains keys that are not valid excel cell keys' do
         RxlSpecHelpers.invalid_string_cell_keys.each_with_index do |key, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = {'worksheet_a' => {key => {}}}
+            hash_workbook_input = { 'worksheet_a' => { key => {} } }
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
             expect(exception.class).to eq(RuntimeError)
-            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_keys, path: ['worksheet_a', key])
+            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_key, path: ['worksheet_a'])
+            expect(exception.message).to eq(expected_message)
+          end
+        end
+      end
+
+      context 'the worksheet contains values that are not hashes' do
+        RxlSpecHelpers.non_hash_values.each_with_index do |cell_value, i|
+          it "[example ##{i + 1}]" do
+            hash_workbook_input = { 'worksheet_a' => { 'A1' => cell_value } }
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
+            expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_cell_value, path: ['worksheet_a', 'A1'])
             expect(exception.message).to eq(expected_message)
           end
         end

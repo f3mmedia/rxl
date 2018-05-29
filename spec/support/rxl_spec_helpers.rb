@@ -115,7 +115,8 @@ module RxlSpecHelpers
         non_string_worksheet_name: 'worksheet name must be a String',
         empty_string_worksheet_name: 'worksheet name must not be an empty String',
         non_hash_worksheet: "worksheet value at path #{args[:path]} must be a Hash",
-        invalid_cell_keys: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")]
+        invalid_cell_key: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")],
+        non_hash_cell_value: "cell value at path #{args[:path]} must be a Hash"
       }[key]
     }[type]
     raise("no value found for type :#{type} and key :#{key}") unless return_value

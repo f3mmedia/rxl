@@ -36,7 +36,7 @@ module Workbook
   def self.validate_hash_workbook(hash_workbook)
     raise('workbook must be a Hash') unless hash_workbook.is_a?(Hash)
     hash_workbook.each do |hash_worksheet_name, hash_worksheet|
-      Worksheet.validate_hash_worksheet(hash_worksheet_name, hash_worksheet, [hash_worksheet_name])
+      Worksheet.validate_hash_worksheet(hash_worksheet_name, hash_worksheet)
     end
   end
 
