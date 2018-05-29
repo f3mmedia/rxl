@@ -80,6 +80,7 @@ describe Rxl do
         RxlSpecHelpers.non_hash_values.each_with_index do |hash_workbook_input, i|
           it "[example ##{i + 1}]" do
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
             expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_hash_workbook))
           end
         end
@@ -90,7 +91,19 @@ describe Rxl do
           it "[example ##{i + 1}]" do
             hash_workbook_input = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
             expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_string_worksheet_name))
+          end
+        end
+      end
+
+      context 'the workbook contains an empty string key' do
+        RxlSpecHelpers.empty_string_key_arrays.each_with_index do |key_array, i|
+          it "[example ##{i + 1}]" do
+            hash_workbook_input = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
+            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :empty_string_worksheet_name))
           end
         end
       end
@@ -100,6 +113,7 @@ describe Rxl do
           it "[example ##{i + 1}]" do
             filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
             exception = Rxl.write_file(filepath, {'worksheet_a' => worksheet_input})
+            expect(exception.class).to eq(RuntimeError)
             expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_worksheet, path: ['worksheet_a'])
             expect(exception.message).to eq(expected_message)
           end

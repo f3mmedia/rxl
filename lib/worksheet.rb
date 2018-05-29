@@ -95,15 +95,12 @@ module Worksheet
 
   def self.validate_hash_worksheet(hash_worksheet_name, hash_worksheet, trace)
     unless hash_worksheet_name.is_a?(String)
-      # TODO: add path to this validation
       raise('worksheet name must be a String')
     end
+    raise('worksheet name must not be an empty String') if hash_worksheet_name.empty?
     unless hash_worksheet.is_a?(Hash)
       raise("worksheet value at path #{trace} must be a Hash")
     end
-
-    # TODO: check for duplicate cell keys
-
     hash_worksheet.each do |hash_cell_key, hash_cell|
       Cell.validate_hash_cell(hash_cell_key, hash_cell, trace + [hash_cell_key])
     end

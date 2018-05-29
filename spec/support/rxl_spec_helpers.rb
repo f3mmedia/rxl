@@ -113,6 +113,7 @@ module RxlSpecHelpers
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
         non_string_worksheet_name: 'worksheet name must be a String',
+        empty_string_worksheet_name: 'worksheet name must not be an empty String',
         non_hash_worksheet: "worksheet value at path #{args[:path]} must be a Hash",
         invalid_cell_keys: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")]
       }[key]
@@ -229,6 +230,15 @@ module RxlSpecHelpers
       ['worksheet_a', {}],
       [true, 'worksheet_b'],
       ['worksheet_a', false]
+    ]
+  end
+
+  def self.empty_string_key_arrays
+    [
+      [''],
+      ['worksheet_a', ''],
+      ['', 'worksheet_a'],
+      ['worksheet_a', '', 'worksheet_b']
     ]
   end
 
