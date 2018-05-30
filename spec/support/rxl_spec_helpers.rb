@@ -116,7 +116,9 @@ module RxlSpecHelpers
         empty_string_worksheet_name: 'worksheet name must not be an empty String',
         non_hash_worksheet: "worksheet value at path #{args[:path]} must be a Hash",
         invalid_cell_key: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")],
-        non_hash_cell_value: "cell value at path #{args[:path]} must be a Hash"
+        non_hash_cell_value: "cell value at path #{args[:path]} must be a Hash",
+        non_symbol_cell_hash_key: "cell key at path #{args[:path]} must be a Symbol",
+        invalid_cell_hash_key: %(invalid cell hash key at path #{args[:path]}, valid keys are: [#{args[:valid_cell_keys_string]}])
       }[key]
     }[type]
     raise("no value found for type :#{type} and key :#{key}") unless return_value
@@ -243,7 +245,7 @@ module RxlSpecHelpers
     ]
   end
 
-  def self.non_hash_values
+  def self.example_class_values
     [
       nil,
       true,
@@ -255,21 +257,8 @@ module RxlSpecHelpers
       [],
       %w[a b c],
       [1, 2, 3],
-      {}.to_json
-    ]
-  end
-
-  def self.non_string_values
-    [
-      nil,
-      true,
-      false,
-      :cells,
-      0,
-      [],
-      %w[a b c],
-      [1, 2, 3],
       {},
+      { a: 1, b: 2 },
       {}.to_json
     ]
   end
@@ -295,6 +284,13 @@ module RxlSpecHelpers
       A11111111
     ]
     keys + %i[invalid A1]
+  end
+
+  def self.invalid_cell_hash_key_arrays
+    [
+      %i[a b c],
+      %i[value number formula cell]
+    ]
   end
 
 end

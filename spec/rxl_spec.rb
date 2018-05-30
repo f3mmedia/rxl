@@ -77,7 +77,8 @@ describe Rxl do
 
     context 'it returns an exception where' do
       context 'the workbook is not a hash' do
-        RxlSpecHelpers.non_hash_values.each_with_index do |hash_workbook_input, i|
+        non_hash_values = RxlSpecHelpers.example_class_values.delete_if { |value| value.is_a?(Hash) }
+        non_hash_values.each_with_index do |hash_workbook_input, i|
           it "[example ##{i + 1}]" do
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
             expect(exception.class).to eq(RuntimeError)
@@ -109,7 +110,8 @@ describe Rxl do
       end
 
       context 'the worksheet is not a hash' do
-        RxlSpecHelpers.non_hash_values.each_with_index do |worksheet_input, i|
+        non_hash_values = RxlSpecHelpers.example_class_values.delete_if { |value| value.is_a?(Hash) }
+        non_hash_values.each_with_index do |worksheet_input, i|
           it "[example ##{i + 1}]" do
             filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
             exception = Rxl.write_file(filepath, {'worksheet_a' => worksheet_input})
@@ -133,12 +135,40 @@ describe Rxl do
       end
 
       context 'the worksheet contains values that are not hashes' do
-        RxlSpecHelpers.non_hash_values.each_with_index do |cell_value, i|
+        non_hash_values = RxlSpecHelpers.example_class_values.delete_if { |value| value.is_a?(Hash) }
+        non_hash_values.each_with_index do |cell_value, i|
           it "[example ##{i + 1}]" do
             hash_workbook_input = { 'worksheet_a' => { 'A1' => cell_value } }
             exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
             expect(exception.class).to eq(RuntimeError)
             expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_cell_value, path: ['worksheet_a', 'A1'])
+            expect(exception.message).to eq(expected_message)
+          end
+        end
+      end
+
+      context 'the cell hash contains non-symbol keys' do
+        non_symbol_values = RxlSpecHelpers.example_class_values.reject { |value| value.is_a?(Symbol) }
+        non_symbol_values.each_with_index do |key, i|
+          it "[example ##{i + 1}]" do
+            hash_workbook_input = { 'worksheet_a' => { 'A1' => { key => nil } } }
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
+            expected_message = RxlSpecHelpers.test_data(:validation, :non_symbol_cell_hash_key, path: ['worksheet_a', 'A1'])
+            expect(exception.message).to eq(expected_message)
+          end
+        end
+      end
+
+      context 'the cell hash contains invalid keys' do
+        RxlSpecHelpers.invalid_cell_hash_key_arrays.each_with_index do |key_array, i|
+          it "[example ##{i + 1}]" do
+            cell_hash = key_array.each_with_object({}) { |key, hash| hash[key] = nil }
+            hash_workbook_input = { 'worksheet_a' => { 'A1' => cell_hash } }
+            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
+            expect(exception.class).to eq(RuntimeError)
+            args = { path: ['worksheet_a', 'A1'], valid_cell_keys_string: ':value, :number, :formula' }
+            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_hash_key, args)
             expect(exception.message).to eq(expected_message)
           end
         end

@@ -88,6 +88,13 @@ module Cell
     unless hash_cell.is_a?(Hash)
       raise("cell value at path #{trace + [hash_cell_key]} must be a Hash")
     end
+    unless hash_cell.keys.reject { |key| key.is_a?(Symbol) }.empty?
+      raise("cell key at path #{trace + [hash_cell_key]} must be a Symbol")
+    end
+    unless hash_cell.keys.delete_if { |key| valid_cell_keys.include?(key) }.empty?
+      valid_cell_keys_string = ":#{valid_cell_keys.join(', :')}"
+      raise(%(invalid cell hash key at path #{trace + [hash_cell_key]}, valid keys are: [#{valid_cell_keys_string}]))
+    end
     # TODO: add validation for hash_cell specification
   end
 
@@ -98,6 +105,14 @@ module Cell
     return false unless cell_index[0].between?(0, 1_048_575)
     return false unless cell_index[0].between?(0, 16383)
     true
+  end
+
+  def self.valid_cell_keys
+    %i[
+      value
+      number
+      formula
+    ]
   end
 
 end
