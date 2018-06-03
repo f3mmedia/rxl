@@ -32,81 +32,81 @@ module RxlSpecHelpers
           'test_b' => {rows: {}, columns: {}, cells: {}}
         },
         cell_raw_string_read: {
-          'B2' => {value: 'abcde', format: :text, formula: nil},
-          'B3' => {value: 'abcde', format: :text, formula: nil},
-          'B4' => {value: 'abcde', format: :text, formula: nil},
-          'B5' => {value: 'abcde', format: :text, formula: nil},
-          'B6' => {value: 'abcde', format: :text, formula: nil},
-          'B7' => {value: 'abcde', format: :text, formula: nil}
+          'B2' => {value: 'abcde', format: :text},
+          'B3' => {value: 'abcde', format: :text},
+          'B4' => {value: 'abcde', format: :text},
+          'B5' => {value: 'abcde', format: :text},
+          'B6' => {value: 'abcde', format: :text},
+          'B7' => {value: 'abcde', format: :text}
         },
         cell_raw_number_read: {
-          'B2' => {value: 12345, format: :number, formula: nil},
-          'B3' => {value: '12345', format: :text, formula: nil},
-          'B4' => {value: 12345, format: :number, formula: nil}
+          'B2' => {value: 12345, format: :number},
+          'B3' => {value: '12345', format: :text},
+          'B4' => {value: 12345, format: :number}
         },
         cell_raw_float_read: {
-          'B3' => {value: '123.45', format: :text, formula: nil},
-          'B4' => {value: 123.45, format: :number, formula: nil}
+          'B3' => {value: '123.45', format: :text},
+          'B4' => {value: 123.45, format: :number}
         },
         cell_raw_date_read: {
-          'B3' => {value: '01/01/2000', format: :text, formula: nil},
-          'B5' => {value: DateTime.parse('01/01/2000'), format: :date, formula: nil},
-          'B6' => {value: DateTime.parse('01/01/2000'), format: :date, formula: nil},
-          'B7' => {value: '01/01/2000%', format: :text, formula: nil}
+          'B3' => {value: '01/01/2000', format: :text},
+          'B5' => {value: DateTime.parse('01/01/2000'), format: :date},
+          'B6' => {value: DateTime.parse('01/01/2000'), format: :date},
+          'B7' => {value: '01/01/2000%', format: :text}
         },
         cell_raw_time_read: {
-          'B3' => {value: '10:15:30', format: :text, formula: nil},
-          'B6' => {value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: nil},
-          'B7' => {value: '10:15:30%', format: :text, formula: nil}
+          'B3' => {value: '10:15:30', format: :text},
+          'B6' => {value: DateTime.parse('31/12/1899 10:15:30'), format: :time},
+          'B7' => {value: '10:15:30%', format: :text}
         },
         cell_raw_percentage_read: {
-          'B3' => {value: '100%', format: :text, formula: nil},
-          'B7' => {value: 1, format: :number, formula: nil}
+          'B3' => {value: '100%', format: :text},
+          'B7' => {value: 1, format: :number}
         },
         cell_raw_percentage_float_read: {
-          'B3' => {value: '123.45%', format: :text, formula: nil},
-          'B7' => {value: 1.2345, format: :number, formula: nil}
+          'B3' => {value: '123.45%', format: :text},
+          'B7' => {value: 1.2345, format: :number}
         },
         cell_raw_empty_read: {
-          'B2' => {value: nil, format: :general, formula: nil},
-          'B3' => {value: nil, format: :general, formula: nil},
-          'B4' => {value: nil, format: :general, formula: nil},
-          'B5' => {value: nil, format: :general, formula: nil},
-          'B6' => {value: nil, format: :general, formula: nil},
-          'B7' => {value: nil, format: :general, formula: nil}
+          'B2' => {format: :general},
+          'B3' => {format: :general},
+          'B4' => {format: :general},
+          'B5' => {format: :general},
+          'B6' => {format: :general},
+          'B7' => {format: :general}
         },
         cell_formula_string_read: {
           'C2' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
           'C3' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
-          'C4' => {value: 'abcde', format: :text, formula: nil},
-          'C5' => {value: 'abcde', format: :text, formula: nil},
+          'C4' => {value: 'abcde', format: :text},
+          'C5' => {value: 'abcde', format: :text},
           'C6' => {value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'},
-          'C7' => {value: 'abcde', format: :text, formula: nil}
+          'C7' => {value: 'abcde', format: :text}
         },
         cell_formula_number_read: {
           'C2' => {value: 12345, format: :number, formula: '12340+5'},
-          'C3' => {value: '=12340+5', format: :text, formula: nil},
+          'C3' => {value: '=12340+5', format: :text},
           'C4' => {value: 12345, format: :number, formula: '12340+5'}
         },
         cell_formula_float_read: {
-          'C3' => {value: '=123.41+0.04', format: :text, formula: nil},
+          'C3' => {value: '=123.41+0.04', format: :text},
           'C4' => {value: 123.45, format: :number, formula: '123.41+0.04'}
         },
         cell_formula_date_read: {
-          'C3' => {value: '=DATE(2000,1,1)', format: :text, formula: nil},
+          'C3' => {value: '=DATE(2000,1,1)', format: :text},
           'C5' => {value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)'},
           'C6' => {value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)'}
         },
         cell_formula_time_read: {
-          'C3' => {value: '=TIME(10,15,30)', format: :text, formula: nil},
+          'C3' => {value: '=TIME(10,15,30)', format: :text},
           'C6' => {value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: 'TIME(10,15,30)'}
         },
         cell_formula_percentage_read: {
-          'C3' => {value: '=50%+50%', format: :text, formula: nil},
+          'C3' => {value: '=50%+50%', format: :text},
           'C7' => {value: 1, format: :number, formula: '50%+50%'}
         },
         cell_formula_percentage_float_read: {
-          'C3' => {value: '=123.41%+0.04%', format: :text, formula: nil},
+          'C3' => {value: '=123.41%+0.04%', format: :text},
           'C7' => {value: 1.2345, format: :number, formula: '123.41%+0.04%'}
         },
       }[key],

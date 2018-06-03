@@ -8,11 +8,12 @@ module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell=nil)
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
-    {
+    hash_cell = {
         value: rubyxl_cell_value,
         format: hash_cell_format(rubyxl_cell_value),
         formula: extract_cell_formula(rubyxl_cell)
     }
+    hash_cell.delete_if { |_, value| value.nil? }
   end
 
   def self.extract_cell_formula(rubyxl_cell)
