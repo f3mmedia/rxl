@@ -50,7 +50,7 @@ describe Rxl do
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file))
       expect(read_hash.keys.length).to eq(1)
       expect(read_hash.keys[0]).to eq('Sheet1')
-      expect(read_hash['Sheet1']).to eq({rows: {}, columns: {}, cells: {}})
+      expect(read_hash['Sheet1']).to eq({})
     end
 
     context 'saves one or more sheets with the name specified and removes "Sheet1"' do
@@ -69,7 +69,7 @@ describe Rxl do
           expect(read_hash.keys.length).to eq(worksheet_name_array.length)
           expect(read_hash.keys).to eq(worksheet_name_array)
           worksheet_name_array.each do |worksheet_name|
-            expect(read_hash[worksheet_name]).to eq(rows: {}, columns: {}, cells: {})
+            expect(read_hash[worksheet_name]).to eq({})
           end
         end
       end

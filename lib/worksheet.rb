@@ -10,24 +10,13 @@ module Worksheet
   ########################################################
 
   def self.rubyxl_to_hash(rubyxl_worksheet)
-    hash_worksheet = hash_worksheet_template(rubyxl_worksheet.count)
     rubyxl_rows = rubyxl_worksheet.each_with_index.map do |rubyxl_row, rubyxl_row_index|
-      {rubyxl_row: rubyxl_row, rubyxl_row_index: rubyxl_row_index}
+      { rubyxl_row: rubyxl_row, rubyxl_row_index: rubyxl_row_index }
     end
-    Cells.rubyxl_to_hash(rubyxl_rows, hash_worksheet)
+    hash_worksheet = Cells.rubyxl_to_hash(rubyxl_rows)
     process_sheet_to_populated_block(hash_worksheet)
     Mitrush.delete_keys(hash_worksheet, %i[row_count column_count])
     hash_worksheet
-  end
-
-  def self.hash_worksheet_template(rubyxl_worksheet_row_count)
-    {
-        row_count: rubyxl_worksheet_row_count,
-        column_count: 1,
-        rows: {},
-        columns: {},
-        cells: {}
-    }
   end
 
 
@@ -36,7 +25,7 @@ module Worksheet
   ########################################################
 
   def self.hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
-    Worksheet.process_sheet_to_populated_block(hash_worksheet)
+    process_sheet_to_populated_block(hash_worksheet)
     (hash_worksheet[:cells] || {}).sort.each do |hash_cell_key, hash_cell|
       combined_hash_cell = Cell.get_combined_hash_cell(hash_worksheet, hash_cell_key, hash_cell)
       row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
@@ -51,25 +40,23 @@ module Worksheet
   ##############################
 
   def self.process_sheet_to_populated_block(hash_worksheet)
-    Worksheet.set_hash_worksheet_extents(hash_worksheet)
-    hash_worksheet[:row_count].times do |row_index|
-      hash_worksheet[:column_count].times do |column_index|
+    extent = hash_worksheet_extents(hash_worksheet)
+    extent[:row_count].times do |row_index|
+      extent[:column_count].times do |column_index|
         cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
-        hash_worksheet[:cells][cell_key] = {} unless hash_worksheet[:cells][cell_key]
+        hash_worksheet[cell_key] = {} unless hash_worksheet[cell_key]
       end
     end
   end
 
-  def self.set_hash_worksheet_extents(hash_worksheet)
-    row_keys = (hash_worksheet[:rows] || {}).keys.map { |item| "A#{item}" }
-    column_keys = (hash_worksheet[:columns] || {}).keys.map { |item| "#{item}1" }
-    hash_worksheet[:row_count] = 0
-    hash_worksheet[:column_count] = 0
-    ((hash_worksheet[:cells] || {}).keys + row_keys + column_keys).each do |hash_cell_key|
+  def self.hash_worksheet_extents(hash_worksheet)
+    extents = { row_count: 0, column_count: 0 }
+    (hash_worksheet || {}).keys.each do |hash_cell_key|
       row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
-      hash_worksheet[:row_count] = row_index + 1 if row_index >= hash_worksheet[:row_count]
-      hash_worksheet[:column_count] = column_index + 1 if column_index >= hash_worksheet[:column_count]
+      extents[:row_count] = row_index + 1 if row_index >= extents[:row_count]
+      extents[:column_count] = column_index + 1 if column_index >= extents[:column_count]
     end
+    extents
   end
 
 

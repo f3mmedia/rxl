@@ -26,10 +26,10 @@ module RxlSpecHelpers
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
       expected_hash: {
-        empty_file: { 'Sheet1' => {rows: {}, columns: {}, cells: {} } },
+        empty_file: { 'Sheet1' => {} },
         worksheet_names: {
-          'test_a' => { rows: {}, columns: {}, cells: {} },
-          'test_b' => { rows: {}, columns: {}, cells: {} }
+          'test_a' => {},
+          'test_b' => {}
         },
         cell_raw_string_read: {
           'B2' => { value: 'abcde', format: :text },
@@ -219,7 +219,7 @@ module RxlSpecHelpers
 
   def self.read_and_test_cell_values(test, expected_key, worksheet_name, cell_range)
     read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats))
-    cell_range = read_hash[worksheet_name][:cells].select { |key, _| key[cell_range] }
+    cell_range = read_hash[worksheet_name].select { |key, _| key[cell_range] }
     test.expect(cell_range).to test.eq(RxlSpecHelpers.test_data(:expected_hash, expected_key))
   end
 
