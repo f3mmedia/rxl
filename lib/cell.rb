@@ -6,21 +6,30 @@ module Cell
   ###     GET HASH CELL FROM RUBYXL CELL     ###
   ##############################################
 
-  def self.rubyxl_cell_to_hash_cell(rubyxl_cell=nil)
+  def self.rubyxl_cell_to_hash_cell(rubyxl_cell = nil)
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
-    hash_cell = {
+    {
         value: rubyxl_cell_value,
         format: hash_cell_format(rubyxl_cell_value),
-        formula: extract_cell_formula(rubyxl_cell),
-        h_align: rubyxl_cell.horizontal_alignment.nil? ? nil : rubyxl_cell.horizontal_alignment.to_sym,
-        v_align: rubyxl_cell.vertical_alignment ? rubyxl_cell.vertical_alignment.to_sym : :bottom
+        formula: rubyxl_cell_formula(rubyxl_cell),
+        h_align: rubyxl_cell_horizontal_alignment(rubyxl_cell),
+        v_align: rubyxl_cell_vertical_alignment(rubyxl_cell)
     }
-    hash_cell.delete_if { |_, value| value.nil? }
   end
 
-  def self.extract_cell_formula(rubyxl_cell)
+  def self.rubyxl_cell_formula(rubyxl_cell)
     return nil if rubyxl_cell.nil? || rubyxl_cell.formula.nil? || rubyxl_cell.formula.expression.empty?
     rubyxl_cell.formula.expression
+  end
+
+  def self.rubyxl_cell_horizontal_alignment(rubyxl_cell)
+    return nil if rubyxl_cell.nil? || rubyxl_cell.horizontal_alignment.nil?
+    rubyxl_cell.horizontal_alignment.to_sym
+  end
+
+  def self.rubyxl_cell_vertical_alignment(rubyxl_cell)
+    return :bottom if rubyxl_cell.nil? || rubyxl_cell.vertical_alignment.nil?
+    rubyxl_cell.vertical_alignment.to_sym
   end
 
   def self.hash_cell_format(rubyxl_cell_value)

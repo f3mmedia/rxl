@@ -44,7 +44,7 @@ module Worksheet
     extent[:row_count].times do |row_index|
       extent[:column_count].times do |column_index|
         cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
-        hash_worksheet[cell_key] = {} unless hash_worksheet[cell_key]
+        hash_worksheet[cell_key] = Cell.rubyxl_cell_to_hash_cell unless hash_worksheet[cell_key]
       end
     end
   end
