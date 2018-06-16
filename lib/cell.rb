@@ -11,7 +11,9 @@ module Cell
     hash_cell = {
         value: rubyxl_cell_value,
         format: hash_cell_format(rubyxl_cell_value),
-        formula: extract_cell_formula(rubyxl_cell)
+        formula: extract_cell_formula(rubyxl_cell),
+        h_align: rubyxl_cell.horizontal_alignment.nil? ? nil : rubyxl_cell.horizontal_alignment.to_sym,
+        v_align: rubyxl_cell.vertical_alignment ? rubyxl_cell.vertical_alignment.to_sym : :bottom
     }
     hash_cell.delete_if { |_, value| value.nil? }
   end

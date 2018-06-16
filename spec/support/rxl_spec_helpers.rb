@@ -17,10 +17,9 @@ module RxlSpecHelpers
     test.expect(path.exist?)
   end
 
-  def self.test_data(type, key, args = {})
-    temp_xlsx_path = ENV['TEMP_XLSX_PATH']
+  def self.test_data(type, key = nil, args = {})
     return_value = {
-      filepath: derived_filepath(key, temp_xlsx_path),
+      filepath: "#{args[:path] || ENV['TEMP_XLSX_PATH']}/#{key}.xlsx",
       write_hash: {
         empty_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
@@ -108,7 +107,8 @@ module RxlSpecHelpers
         cell_formula_percentage_float_read: {
           'C3' => { value: '=123.41%+0.04%', format: :text },
           'C7' => { value: 1.2345, format: :number, formula: '123.41%+0.04%' }
-        }
+        },
+        horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash
       }[key],
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
@@ -125,11 +125,70 @@ module RxlSpecHelpers
     return_value
   end
 
-  def self.derived_filepath(key, xlsx_path)
-    filepath = {
-      cell_values_and_formats: 'spec/support/static_test_files/cell_values_and_formats.xlsx'
-    }[key]
-    filepath || "#{xlsx_path}/#{key}.xlsx"
+  def self.horizontal_and_vertical_alignment_expected_hash
+    {
+      'A1' => {
+        value: 'abc',
+        format: :text,
+        h_align: :left,
+        v_align: :top
+      },
+      'B1' => {
+        value: 'abc',
+        format: :text,
+        h_align: :center,
+        v_align: :top
+      },
+      'C1' => {
+        value: 'abc',
+        format: :text,
+        h_align: :right,
+        v_align: :top
+      },
+      'A2' => {
+        value: 'abc',
+        format: :text,
+        h_align: :left,
+        v_align: :center
+      },
+      'B2' => {
+        value: 'abc',
+        format: :text,
+        h_align: :center,
+        v_align: :center
+      },
+      'C2' => {
+        value: 'abc',
+        format: :text,
+        h_align: :right,
+        v_align: :center
+      },
+      'A3' => {
+        value: 'abc',
+        format: :text,
+        h_align: :left,
+        v_align: :bottom
+      },
+      'B3' => {
+        value: 'abc',
+        format: :text,
+        h_align: :center,
+        v_align: :bottom
+      },
+      'C3' => {
+        value: 'abc',
+        format: :text,
+        h_align: :right,
+        v_align: :bottom
+      },
+      'A4' => {
+        value: 'abc',
+        format: :text,
+        v_align: :bottom
+      },
+      'B4' => {},
+      'C4' => {}
+    }
   end
 
   def self.raw_cell_value_test_data_hash
@@ -218,7 +277,8 @@ module RxlSpecHelpers
   end
 
   def self.read_and_test_cell_values(test, expected_key, worksheet_name, cell_range)
-    read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats))
+    path = 'spec/support/static_test_files'
+    read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats, path: path))
     cell_range = read_hash[worksheet_name].select { |key, _| key[cell_range] }
     test.expect(cell_range).to test.eq(RxlSpecHelpers.test_data(:expected_hash, expected_key))
   end

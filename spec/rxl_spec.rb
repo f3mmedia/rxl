@@ -37,6 +37,12 @@ describe Rxl do
         end
       end
     end
+
+    it 'reads horizontal and vertical cell alignment' do
+      path = 'spec/support/static_test_files'
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :horizontal_and_vertical_alignment, path: path))
+      expect(read_hash['values']).to eq(RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment))
+    end
   end
 
   # MANUAL TESTS FOR SUCCESSFUL WRITE
