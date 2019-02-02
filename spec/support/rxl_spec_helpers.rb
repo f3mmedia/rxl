@@ -252,39 +252,47 @@ module RxlSpecHelpers
       'Sheet2' => [
         {
           'header_1' => 'row_1_a',
-          'header_2' => 'row_1_b',
-          'header_3' => 'row_1_c',
-          'header_4' => 'row_1_d'
+          'header_2' => 'row_1_b'
         },
         {
           'header_1' => 'row_2_a',
-          'header_2' => 'row_2_b',
-          'header_3' => 'row_2_c',
-          'header_4' => 'row_2_d'
+          'header_2' => 'row_2_b'
         },
         {
           'header_1' => 'row_3_a',
-          'header_2' => 'row_3_b',
-          'header_3' => 'row_3_c',
-          'header_4' => 'row_3_d'
+          'header_2' => 'row_3_b'
+        },
+        {
+          'header_1' => 'row_4_a',
+          'header_2' => 'row_4_b'
+        },
+        {
+          'header_1' => 'row_5_a',
+          'header_2' => 'row_5_b'
+        },
+        {
+          'header_1' => 'row_6_a',
+          'header_2' => 'row_6_b'
+        },
+        {
+          'header_1' => 'row_7_a',
+          'header_2' => 'row_7_b'
+        },
+        {
+          'header_1' => 'row_8_a',
+          'header_2' => 'row_8_b'
         },
         {
           'header_1' => nil,
-          'header_2' => nil,
-          'header_3' => nil,
-          'header_4' => nil
+          'header_2' => nil
         },
         {
           'header_1' => nil,
-          'header_2' => nil,
-          'header_3' => nil,
-          'header_4' => nil
+          'header_2' => nil
         },
         {
           'header_1' => 'sum_1',
-          'header_2' => 'sum_2',
-          'header_3' => 'sum_3',
-          'header_4' => 'sum_4'
+          'header_2' => 'sum_2'
         }
       ]
     }

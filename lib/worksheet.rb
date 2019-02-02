@@ -73,7 +73,7 @@ module Worksheet
   def self.hash_worksheet_to_hash_table(raw_hash)
     cells = Mitrush.deep_copy(raw_hash)
     columns = cells.keys.map { |key| key[/\D+/] }.uniq
-    row_nums = cells.keys.map { |key| key[/\d+/] }.uniq[1..-1].sort
+    row_nums = cells.keys.map { |key| key[/\d+/].to_i }.uniq[1..-1].sort
     row_nums.map do |row_number|
       columns.each_with_object({}) do |column_letter, h|
         h[cells["#{column_letter}1"][:value]] = cells["#{column_letter}#{row_number}"][:value]
