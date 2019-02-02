@@ -4,6 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'awesome_print'
-gem 'mitrush'
+gem 'mitrush', '>= 0.2.0'
 gem 'rubocop'
 gem 'rubyXL'
