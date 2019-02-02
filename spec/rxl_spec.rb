@@ -43,6 +43,20 @@ describe Rxl do
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :horizontal_and_vertical_alignment, path: path))
       expect(read_hash['values']).to eq(RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment))
     end
+
+    it 'reads in sheets as tables' do
+      path = 'spec/support/static_test_files'
+      read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :as_tables, path: path))
+      expected_hash = RxlSpecHelpers.test_data(:expected_hash, :as_tables)
+      expect(read_hash.keys).to eq(expected_hash.keys)
+      expected_hash.keys.each do |key|
+        expect(read_hash[key]).to be_a(Array)
+        expect(read_hash[key].length).to eq(expected_hash[key].length)
+        expected_hash[key].each do |item|
+          expect(read_hash[key]).to include(item)
+        end
+      end
+    end
   end
 
   # MANUAL TESTS FOR SUCCESSFUL WRITE

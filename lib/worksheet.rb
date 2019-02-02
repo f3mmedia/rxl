@@ -10,8 +10,8 @@ module Worksheet
   ########################################################
 
   def self.rubyxl_to_hash(rubyxl_worksheet)
-    rubyxl_rows = rubyxl_worksheet.each_with_index.map do |rubyxl_row, rubyxl_row_index|
-      { rubyxl_row: rubyxl_row, rubyxl_row_index: rubyxl_row_index }
+    rubyxl_rows = rubyxl_worksheet.map do |rubyxl_row|
+      { rubyxl_row: rubyxl_row, rubyxl_row_index: rubyxl_row ? rubyxl_row.r - 1 : nil }
     end
     hash_worksheet = Cells.rubyxl_to_hash(rubyxl_rows)
     process_sheet_to_populated_block(hash_worksheet)
@@ -71,11 +71,12 @@ module Worksheet
   end
 
   def self.hash_worksheet_to_hash_table(raw_hash)
-    cells = raw_hash[:cells]
+    cells = Mitrush.deep_copy(raw_hash)
     columns = cells.keys.map { |key| key[/\D+/] }.uniq
-    cells.keys.map { |key| key[/\d+/] }.uniq[1..-1].map do |row_number|
-      columns.each_with_object({}) do |column_letter, this_hash|
-        this_hash[cells["#{column_letter}1"][:value]] = cells["#{column_letter}#{row_number}"][:value]
+    row_nums = cells.keys.map { |key| key[/\d+/] }.uniq[1..-1].sort
+    row_nums.map do |row_number|
+      columns.each_with_object({}) do |column_letter, h|
+        h[cells["#{column_letter}1"][:value]] = cells["#{column_letter}#{row_number}"][:value]
       end
     end
   end

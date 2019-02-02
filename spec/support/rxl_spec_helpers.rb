@@ -118,7 +118,8 @@ module RxlSpecHelpers
           'C3' => hash_cell_template.merge(value: '=123.41%+0.04%', format: :text),
           'C7' => hash_cell_template.merge(value: 1.2345, format: :number, formula: '123.41%+0.04%')
         },
-        horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash
+        horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
+        as_tables: as_tables_expected_hash
       }[key],
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
@@ -221,6 +222,71 @@ module RxlSpecHelpers
         h_align: nil,
         v_align: :bottom
       }
+    }
+  end
+
+  def self.as_tables_expected_hash
+    {
+      'Sheet1' => [
+        {
+          'header_1' => 'row_1_a',
+          'header_2' => 'row_1_b',
+          'header_3' => 'row_1_c'
+        },
+        {
+          'header_1' => 'row_2_a',
+          'header_2' => 'row_2_b',
+          'header_3' => 'row_2_c'
+        },
+        {
+          'header_1' => nil,
+          'header_2' => nil,
+          'header_3' => nil
+        },
+        {
+          'header_1' => 'sum_1',
+          'header_2' => 'sum_2',
+          'header_3' => 'sum_3'
+        }
+      ],
+      'Sheet2' => [
+        {
+          'header_1' => 'row_1_a',
+          'header_2' => 'row_1_b',
+          'header_3' => 'row_1_c',
+          'header_4' => 'row_1_d'
+        },
+        {
+          'header_1' => 'row_2_a',
+          'header_2' => 'row_2_b',
+          'header_3' => 'row_2_c',
+          'header_4' => 'row_2_d'
+        },
+        {
+          'header_1' => 'row_3_a',
+          'header_2' => 'row_3_b',
+          'header_3' => 'row_3_c',
+          'header_4' => 'row_3_d'
+        },
+        {
+          'header_1' => nil,
+          'header_2' => nil,
+          'header_3' => nil,
+          'header_4' => nil
+        },
+        {
+          'header_1' => nil,
+          'header_2' => nil,
+          'header_3' => nil,
+          'header_4' => nil
+        },
+        {
+          'header_1' => 'sum_1',
+          'header_2' => 'sum_2',
+          'header_3' => 'sum_3',
+          'header_4' => 'sum_4'
+        }
+      ]
     }
   end
 
