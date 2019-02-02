@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
     Implements functionality written with Excel users in mind for straight reading and writing of sheets.
     Row and column scope values are written to only the cells used; cells are specified by their Excel (A1) ID.
   DESC
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/f3mmedia/rxl"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
