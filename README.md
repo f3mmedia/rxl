@@ -101,6 +101,35 @@ The format of the excel table read hash has the following skeleton:
 }
 ```
 
+### Read multiple files at once
+
+Pass a hash of filepaths to read, get a hash of file contents back.
+
+```ruby
+filepaths_hash = {
+  first_file: 'path/to/file.xlsx',
+  second_file: 'path/to/file.xlsx'
+}
+
+Rxl.read_files(filepaths_hash)
+Rxl.read_files(filepaths_hash, :as_tables)
+```
+
+Returns the files with sheet contents populated with hash of cells (or array of rows if :as_tables read type is specified):
+
+```ruby
+{
+  first_file: {
+    "Sheet1" => 'sheet_contents',
+    "Sheet2" => 'sheet_contents'
+  },
+  second_file: {
+    "Sheet1" => 'sheet_contents',
+    "Sheet2" => 'sheet_contents'
+  },
+}
+```
+
 ### Write to file
 
 To write a file pass the filename and hash:
