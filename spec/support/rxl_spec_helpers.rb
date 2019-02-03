@@ -38,6 +38,7 @@ module RxlSpecHelpers
       expected_hash: {
         empty_file: { 'Sheet1' => {} },
         test_file: { 'Sheet1' => {} },
+        test_table_file: { 'Sheet1' => [] },
         worksheet_names: {
           'test_a' => {},
           'test_b' => {}

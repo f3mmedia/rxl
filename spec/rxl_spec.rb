@@ -91,6 +91,21 @@ describe Rxl do
           expect(read_hash[key]).to eq(RxlSpecHelpers.test_data(:expected_hash, :test_file))
         end
       end
+
+      it 'returns multiple files as tables as a hash when given a hash of filepaths' do
+        path = ENV['TEMP_XLSX_PATH']
+        RxlSpecHelpers.generate_test_excel_file(self, :test_file, path)
+        input = {
+          first_file: RxlSpecHelpers.test_data(:filepath, :test_file, path: path),
+          second_file: RxlSpecHelpers.test_data(:filepath, :test_file, path: path)
+        }
+        read_hash = Rxl.read_files(input, :as_tables)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(%i[first_file second_file])
+        %i[first_file second_file].each do |key|
+          expect(read_hash[key]).to eq(RxlSpecHelpers.test_data(:expected_hash, :test_table_file))
+        end
+      end
     end
   end
 

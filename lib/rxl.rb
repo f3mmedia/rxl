@@ -25,10 +25,10 @@ module Rxl
 
   def self.read_files(filepaths_hash, read_style = nil)
     return_hash = {}
-    if read_style == :as_tables
-
-    else
-      filepaths_hash.each do |key, value|
+    filepaths_hash.each do |key, value|
+      if read_style == :as_tables
+        return_hash[key] = read_file_as_tables(value)
+      else
         return_hash[key] = read_file(value)
       end
     end
