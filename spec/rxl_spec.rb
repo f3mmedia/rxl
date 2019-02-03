@@ -44,18 +44,33 @@ describe Rxl do
       expect(read_hash['values']).to eq(RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment))
     end
 
-    it 'reads in sheets as tables' do
-      path = 'spec/support/static_test_files'
-      read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :as_tables, path: path))
-      expected_hash = RxlSpecHelpers.test_data(:expected_hash, :as_tables)
-      expect(read_hash.keys).to eq(expected_hash.keys)
-      expected_hash.keys.each do |key|
-        expect(read_hash[key]).to be_a(Array)
-        expect(read_hash[key].length).to eq(expected_hash[key].length)
-        expected_hash[key].each do |item|
-          expect(read_hash[key]).to include(item)
+    context 'when reading workbook as tables' do
+
+      it 'reads in sheets as tables' do
+        path = 'spec/support/static_test_files'
+        read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :as_tables, path: path))
+        expected_hash = RxlSpecHelpers.test_data(:expected_hash, :as_tables)
+        expect(read_hash.keys).to eq(expected_hash.keys)
+        expected_hash.keys.each do |key|
+          expect(read_hash[key]).to be_a(Array)
+          expect(read_hash[key].length).to eq(expected_hash[key].length)
+          expected_hash[key].each do |item|
+            expect(read_hash[key]).to include(item)
+          end
         end
       end
+
+      it 'does not include columns with no header' do
+        path = 'spec/support/static_test_files'
+        read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :tables_ignore_no_header_columns, path: path))
+        expected_hash = RxlSpecHelpers.test_data(:expected_hash, :tables_ignore_no_header_columns)
+        expect(read_hash['Sheet1']).to be_a(Array)
+        expect(read_hash['Sheet1'].length).to eq(expected_hash['Sheet1'].length)
+        expected_hash['Sheet1'].each do |item|
+          expect(read_hash['Sheet1']).to include(item)
+        end
+      end
+
     end
   end
 

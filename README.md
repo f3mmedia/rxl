@@ -74,7 +74,11 @@ Further to the above, these rules are applied by Rxl when parsing cells:
 
 ### Read tables from file
 
-To read a file where the data is in table format - headers and values, no totals or otherwise extra content:
+To read a file where the data is in table format.
+
+* headers and rows only - no concept of sums/totals or any other content is provided for.
+* columns which do not contain a value in row 1 are ignored
+* formatting is discarded, only the cell values are retained
 
 ```ruby
 Rxl.read_file_as_tables('path/to/file.xlsx')

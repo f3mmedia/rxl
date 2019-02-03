@@ -119,7 +119,8 @@ module RxlSpecHelpers
           'C7' => hash_cell_template.merge(value: 1.2345, format: :number, formula: '123.41%+0.04%')
         },
         horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
-        as_tables: as_tables_expected_hash
+        as_tables: as_tables_expected_hash,
+        tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash
       }[key],
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
@@ -293,6 +294,21 @@ module RxlSpecHelpers
         {
           'header_1' => 'sum_1',
           'header_2' => 'sum_2'
+        }
+      ]
+    }
+  end
+
+  def self.tables_ignore_no_header_columns_expected_hash
+    {
+      'Sheet1' => [
+        {
+          'header_1' => 'row_1_b',
+          'header_3' => 'row_1_d'
+        },
+        {
+          'header_1' => 'row_2_b',
+          'header_3' => 'row_2_d'
         }
       ]
     }
