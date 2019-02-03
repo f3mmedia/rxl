@@ -23,4 +23,16 @@ module Rxl
     Workbook.hash_workbook_to_hash_tables(hash_workbook)
   end
 
+  def self.read_files(filepaths_hash, read_style = nil)
+    return_hash = {}
+    if read_style == :as_tables
+
+    else
+      filepaths_hash.each do |key, value|
+        return_hash[key] = read_file(value)
+      end
+    end
+    return_hash
+  end
+
 end

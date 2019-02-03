@@ -11,14 +11,16 @@ describe Rxl do
 
   context 'when reading in an excel file' do
     it 'returns a hash_workbook with one empty hash_worksheet from an empty file' do
-      RxlSpecHelpers.generate_test_excel_file(self, :empty_file)
-      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file))
+      path = ENV['TEMP_XLSX_PATH']
+      RxlSpecHelpers.generate_test_excel_file(self, :empty_file, path)
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
       expect(read_hash).to eq(RxlSpecHelpers.test_data(:expected_hash, :empty_file))
     end
 
     it 'reads in worksheet names' do
-      RxlSpecHelpers.generate_test_excel_file(self, :worksheet_names)
-      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :worksheet_names))
+      path = ENV['TEMP_XLSX_PATH']
+      RxlSpecHelpers.generate_test_excel_file(self, :worksheet_names, path)
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :worksheet_names, path: path))
       expect(read_hash).to eq(RxlSpecHelpers.test_data(:expected_hash, :worksheet_names))
     end
 
@@ -39,7 +41,7 @@ describe Rxl do
     end
 
     it 'reads horizontal and vertical cell alignment' do
-      path = 'spec/support/static_test_files'
+      path = ENV['TEST_XLSX_FILES']
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :horizontal_and_vertical_alignment, path: path))
       expect(read_hash['values']).to eq(RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment))
     end
@@ -47,7 +49,7 @@ describe Rxl do
     context 'when reading workbook as tables' do
 
       it 'reads in sheets as tables' do
-        path = 'spec/support/static_test_files'
+        path = ENV['TEST_XLSX_FILES']
         read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :as_tables, path: path))
         expected_hash = RxlSpecHelpers.test_data(:expected_hash, :as_tables)
         expect(read_hash.keys).to eq(expected_hash.keys)
@@ -61,7 +63,7 @@ describe Rxl do
       end
 
       it 'does not include columns with no header' do
-        path = 'spec/support/static_test_files'
+        path = ENV['TEST_XLSX_FILES']
         read_hash = Rxl.read_file_as_tables(RxlSpecHelpers.test_data(:filepath, :tables_ignore_no_header_columns, path: path))
         expected_hash = RxlSpecHelpers.test_data(:expected_hash, :tables_ignore_no_header_columns)
         expect(read_hash['Sheet1']).to be_a(Array)
@@ -72,6 +74,24 @@ describe Rxl do
       end
 
     end
+
+    context 'when reading multiple files' do
+
+      it 'returns multiple files as a hash when given a hash of filepaths' do
+        path = ENV['TEMP_XLSX_PATH']
+        RxlSpecHelpers.generate_test_excel_file(self, :test_file, path)
+        input = {
+          first_file: RxlSpecHelpers.test_data(:filepath, :test_file, path: path),
+          second_file: RxlSpecHelpers.test_data(:filepath, :test_file, path: path)
+        }
+        read_hash = Rxl.read_files(input)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(%i[first_file second_file])
+        %i[first_file second_file].each do |key|
+          expect(read_hash[key]).to eq(RxlSpecHelpers.test_data(:expected_hash, :test_file))
+        end
+      end
+    end
   end
 
   # MANUAL TESTS FOR SUCCESSFUL WRITE
@@ -80,9 +100,10 @@ describe Rxl do
 
   context 'when writing an excel file' do
     it 'saves an empty hash as a file with the specified file name and a single empty sheet as "Sheet1"' do
-      Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file), {})
-      expect(Pathname(RxlSpecHelpers.test_data(:filepath, :empty_file)).exist?).to eq(true)
-      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file))
+      path = ENV['TEMP_XLSX_PATH']
+      Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), {})
+      expect(Pathname(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path)).exist?).to eq(true)
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
       expect(read_hash.keys.length).to eq(1)
       expect(read_hash.keys[0]).to eq('Sheet1')
       expect(read_hash['Sheet1']).to eq({})
@@ -99,8 +120,9 @@ describe Rxl do
           hash_workbook_input = worksheet_name_array.each_with_object({}) do |worksheet_name, hash|
             hash[worksheet_name] = {}
           end
-          Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file), hash_workbook_input)
-          read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file))
+          path = ENV['TEMP_XLSX_PATH']
+          Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), hash_workbook_input)
+          read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
           expect(read_hash.keys.length).to eq(worksheet_name_array.length)
           expect(read_hash.keys).to eq(worksheet_name_array)
           worksheet_name_array.each do |worksheet_name|

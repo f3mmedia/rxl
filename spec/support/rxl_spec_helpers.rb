@@ -20,8 +20,8 @@ module RxlSpecHelpers
     FileUtils.rmtree(path.to_s) if path.exist?
   end
 
-  def self.generate_test_excel_file(test, key)
-    filepath = test_data(:filepath, key)
+  def self.generate_test_excel_file(test, key, path)
+    filepath = test_data(:filepath, key, path: path)
     Rxl.write_file(filepath, test_data(:write_hash, key))
     path = Pathname.new(filepath)
     test.expect(path.exist?)
@@ -29,13 +29,15 @@ module RxlSpecHelpers
 
   def self.test_data(type, key = nil, args = {})
     return_value = {
-      filepath: "#{args[:path] || ENV['TEMP_XLSX_PATH']}/#{key}.xlsx",
+      filepath: "#{args[:path]}/#{key}.xlsx",
       write_hash: {
         empty_file: {},
+        test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
       expected_hash: {
         empty_file: { 'Sheet1' => {} },
+        test_file: { 'Sheet1' => {} },
         worksheet_names: {
           'test_a' => {},
           'test_b' => {}
