@@ -26,11 +26,10 @@ module Worksheet
 
   def self.hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
     process_sheet_to_populated_block(hash_worksheet)
-    (hash_worksheet[:cells] || {}).sort.each do |hash_cell_key, hash_cell|
-      combined_hash_cell = Cell.get_combined_hash_cell(hash_worksheet, hash_cell_key, hash_cell)
+    (hash_worksheet || {}).sort.each do |hash_cell_key, hash_cell|
       row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
-      Cell.add_rubyxl_cells(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
-      Cell.hash_cell_to_rubyxl_cell(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
+      Cell.add_rubyxl_cells(hash_cell, rubyxl_worksheet, row_index, column_index)
+      Cell.hash_cell_to_rubyxl_cell(hash_cell, rubyxl_worksheet, row_index, column_index)
     end
   end
 
@@ -63,12 +62,6 @@ module Worksheet
   ####################################
   ###     OTHER PUBLIC METHODS     ###
   ####################################
-
-  def self.set_hash_worksheet_defaults(hash_worksheet)
-    %i[worksheet columns rows].each do |key|
-      hash_worksheet[key] = {} unless hash_worksheet.has_key?(key)
-    end
-  end
 
   def self.hash_worksheet_to_hash_table(raw_hash)
     cells = Mitrush.deep_copy(raw_hash)

@@ -114,36 +114,50 @@ describe Rxl do
   # hashes and expected outcomes for writing each with Rxl
 
   context 'when writing an excel file' do
-    it 'saves an empty hash as a file with the specified file name and a single empty sheet as "Sheet1"' do
-      path = ENV['TEMP_XLSX_PATH']
-      Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), {})
-      expect(Pathname(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path)).exist?).to eq(true)
-      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
-      expect(read_hash.keys.length).to eq(1)
-      expect(read_hash.keys[0]).to eq('Sheet1')
-      expect(read_hash['Sheet1']).to eq({})
-    end
+    context 'it saves successfully' do
+      it 'saves an empty hash as a file with the specified file name and a single empty sheet as "Sheet1"' do
+        path = ENV['TEMP_XLSX_PATH']
+        Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), {})
+        expect(Pathname(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path)).exist?).to eq(true)
+        read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
+        expect(read_hash.keys.length).to eq(1)
+        expect(read_hash.keys[0]).to eq('Sheet1')
+        expect(read_hash['Sheet1']).to eq({})
+      end
 
-    context 'saves one or more sheets with the name specified and removes "Sheet1"' do
-      worksheet_name_arrays = [
-        ['worksheet_a'],
-        %w[a b c].map { |id| "worksheet_#{id}" },
-        ('a'..'dd').map { |id| "worksheet_#{id}" }
-      ]
-      worksheet_name_arrays.each_with_index do |worksheet_name_array, i|
-        it "[example ##{i + 1}]" do
-          hash_workbook_input = worksheet_name_array.each_with_object({}) do |worksheet_name, hash|
-            hash[worksheet_name] = {}
-          end
-          path = ENV['TEMP_XLSX_PATH']
-          Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), hash_workbook_input)
-          read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
-          expect(read_hash.keys.length).to eq(worksheet_name_array.length)
-          expect(read_hash.keys).to eq(worksheet_name_array)
-          worksheet_name_array.each do |worksheet_name|
-            expect(read_hash[worksheet_name]).to eq({})
+      context 'saves one or more sheets with the name specified and removes "Sheet1"' do
+        worksheet_name_arrays = [
+          ['worksheet_a'],
+          %w[a b c].map { |id| "worksheet_#{id}" },
+          ('a'..'dd').map { |id| "worksheet_#{id}" }
+        ]
+        worksheet_name_arrays.each_with_index do |worksheet_name_array, i|
+          it "[example ##{i + 1}]" do
+            hash_workbook_input = worksheet_name_array.each_with_object({}) do |worksheet_name, hash|
+              hash[worksheet_name] = {}
+            end
+            path = ENV['TEMP_XLSX_PATH']
+            Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path), hash_workbook_input)
+            read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :empty_file, path: path))
+            expect(read_hash.keys.length).to eq(worksheet_name_array.length)
+            expect(read_hash.keys).to eq(worksheet_name_array)
+            worksheet_name_array.each do |worksheet_name|
+              expect(read_hash[worksheet_name]).to eq({})
+            end
           end
         end
+      end
+
+      it 'saves a file with worksheet content' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_content)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_content, path: path)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(['first_sheet'])
+        expect(read_hash['first_sheet'].keys).to eq(%w[A1 A2])
+        expect(read_hash['first_sheet']['A1'][:value]).to eq('cell_a1')
       end
     end
 

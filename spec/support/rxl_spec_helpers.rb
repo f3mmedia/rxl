@@ -32,6 +32,7 @@ module RxlSpecHelpers
       filepath: "#{args[:path]}/#{key}.xlsx",
       write_hash: {
         empty_file: {},
+        save_with_content: save_with_content_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
@@ -138,6 +139,15 @@ module RxlSpecHelpers
     }[type]
     raise("no value found for type :#{type} and key :#{key}") unless return_value
     return_value
+  end
+
+  def self.save_with_content_hash
+    {
+      'first_sheet' => {
+        'A1' => { value: 'cell_a1' },
+        'A2' => { value: 'cell_a2' }
+      }
+    }
   end
 
   def self.horizontal_and_vertical_alignment_expected_hash
