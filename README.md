@@ -138,16 +138,13 @@ To write a file pass the filename and hash:
 Rxl.write_file('path/to/save.xlsx', hash_workbook)
 ```
 
-The format of the excel hash_workbook must contain at least the following skeleton:
+The format of the excel hash_workbook has sheet names as keys and hashes of cells as values:
 
 ```ruby
 {
     "Sheet1" => {
-      cells: {
-          'A1' => {
-              value: 'abc',
-              format: 'text'
-          }
+      'A1' => {
+          value: 'abc'
       }
     }
 }
@@ -179,21 +176,27 @@ The following rules are validated for write_file:
 * The hash_workbook keys must be strings
 * The hash_workbook values (hash_worksheet) must be hashes
 
-
-* The hash_worksheet keys must be symbols
-* The following keys are allowed for hash_worksheet: :cells, :rows, :columns
-* The hash_worksheet values must be arrays - those arrays must contain only hashes
-
-
-* The arrays' child hash keys must be strings of valid Excel cell id format (or stringified number for a row, capitalised alpha for a column)
-* The arrays' child hash values must be hashes (hash_cell)
+* The hash_worksheet keys must be strings of valid Excel cell id format
+* The hash_worksheet values must be hashes (specifying cells)
 * The hash_cell keys must conform the the cell specification as below
 
 * If a formula is provided the value must be nil or an empty string
 * If a number format is provided the value must be consistent with it
 
 
-TODO: Add further detail
+Cells are specified as hashes following this example:
+
+```ruby
+{
+  value: 'abc'
+}
+```
+
+Other keys can be specified:
+* v_align: :top, :centre or :bottom (default)
+* h_align: :left (default), :centre or :right
+
+TODO: add full description for hash_cell_to_rubyxl_cell and rubyxl_cell_to_hash_cell (and check they're as consistent as possible)
 
 ## Development
 
