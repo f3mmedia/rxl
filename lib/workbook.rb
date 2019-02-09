@@ -21,7 +21,6 @@ module Workbook
       else
         rubyxl_workbook.add_worksheet(hash_key)
       end
-      Worksheet.set_hash_worksheet_defaults(hash_value)
       Worksheet.hash_worksheet_to_rubyxl_worksheet(hash_value, rubyxl_workbook[hash_key])
     end
     rubyxl_workbook

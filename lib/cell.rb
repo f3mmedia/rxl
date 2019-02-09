@@ -76,18 +76,6 @@ module Cell
     end
   end
 
-  def self.get_combined_hash_cell(hash_worksheet, hash_cell_key, hash_cell)
-    # first get data from the matching column if it's specified
-    column_keys = hash_worksheet[:columns].keys.select { |key| hash_cell_key =~ /^#{key}\d+$/ }
-    column_keys.empty? ? hash_column = {} : hash_column = hash_worksheet[:columns][column_keys[0]]
-    combined_hash_cell = hash_column.merge(hash_cell)
-    # then get data from the matching row if it's specified
-    row_keys = hash_worksheet[:rows].keys.select { |key| hash_cell_key =~ /^\D+#{key}$/ }
-    row_keys.empty? ? hash_row = {} : hash_row = hash_worksheet[:rows][row_keys[0]]
-    combined_hash_cell = hash_row.merge(combined_hash_cell)
-    hash_worksheet[:worksheet].merge(combined_hash_cell)
-  end
-
 
   ##################################
   ###     VALIDATE HASH CELL     ###
