@@ -159,6 +159,34 @@ describe Rxl do
         expect(read_hash['first_sheet'].keys).to eq(%w[A1 A2])
         expect(read_hash['first_sheet']['A1'][:value]).to eq('cell_a1')
       end
+
+      it 'saves an array of hashes as a table' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file_as_tables(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(['test'])
+        expect(read_hash['test']).to be_a(Array)
+        expect(read_hash).to eq(save_hash)
+      end
+
+      it 'saves an array of hashes as a table without headers' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order, write_headers: false)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(['test'])
+        expect(read_hash['test']).to be_a(Hash)
+        expect(read_hash['test']['A1'][:value]).to eq('r1c1')
+      end
     end
 
     context 'it returns an exception where' do

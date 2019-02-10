@@ -34,6 +34,29 @@ module Worksheet
   end
 
 
+  ################################################
+  ###     GET RUBYXL WORKSHEET FROM HASHES     ###
+  ################################################
+
+  def self.hashes_to_hash_worksheet(hashes, order, write_headers: true)
+    rows = hashes.map do |hash|
+      order.map { |item| hash[item] }
+    end
+    rows.unshift(order.map { |item| "#{item}" }) if write_headers
+    rows_to_hash_worksheet(rows)
+  end
+
+  def self.rows_to_hash_worksheet(rows)
+    rxl_worksheet = {}
+    rows.count.times do |i|
+      rows[i].each_with_index do |cell_value, index|
+        rxl_worksheet["#{column_name(index)}#{i + 1}"] = { value: cell_value }
+      end
+    end
+    rxl_worksheet
+  end
+
+
   ##############################
   ###     SHARED METHODS     ###
   ##############################
@@ -87,6 +110,12 @@ module Worksheet
     hash_worksheet.each do |hash_cell_key, hash_cell|
       Cell.validate_hash_cell(hash_cell_key, hash_cell, [hash_worksheet_name])
     end
+  end
+
+  def self.column_name(int)
+    name = 'A'
+    int.times { name.succ! }
+    name
   end
 
 end

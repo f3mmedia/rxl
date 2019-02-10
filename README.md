@@ -42,7 +42,7 @@ The format of the excel read hash has the following skeleton:
 
 ```ruby
 {
-    "Sheet1" => {
+    'Sheet1' => {
       row_count: 1,
       column_count: 1,
       rows: {},
@@ -88,7 +88,7 @@ The format of the excel table read hash has the following skeleton:
 
 ```ruby
 {
-    "Sheet1" => [
+    'Sheet1' => [
       {
           header_a: value,
           header_b: value
@@ -120,17 +120,19 @@ Returns the files with sheet contents populated with hash of cells (or array of 
 ```ruby
 {
   first_file: {
-    "Sheet1" => 'sheet_contents',
-    "Sheet2" => 'sheet_contents'
+    'Sheet1' => 'sheet_contents',
+    'Sheet2' => 'sheet_contents'
   },
   second_file: {
-    "Sheet1" => 'sheet_contents',
-    "Sheet2" => 'sheet_contents'
+    'Sheet1' => 'sheet_contents',
+    'Sheet2' => 'sheet_contents'
   },
 }
 ```
 
 ### Write to file
+
+Any exception is swallowed and returned.
 
 To write a file pass the filename and hash:
 
@@ -142,11 +144,44 @@ The format of the excel hash_workbook has sheet names as keys and hashes of cell
 
 ```ruby
 {
-    "Sheet1" => {
+    'Sheet1' => {
       'A1' => {
           value: 'abc'
       }
     }
+}
+```
+
+### Write to file as tables
+
+Any exception is swallowed and returned.
+
+To write a file as pass the filename and hash:
+
+```ruby
+Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables, order)
+```
+
+The worsheets' top row will be populated with values specified in the `order` array. Those array items will also be used to extract the current row from the current hash.
+
+* use `nil` in the `order` array to leave blank columns (including blank header)
+* string or symbol keys can be used, so long as the key in order is the same as in the hashes
+
+The format of the excel hash_workbook has sheet names as keys and hashes of rows as values:
+
+```ruby
+order = %i[header_a header_b]
+hash_tables = {
+    'Sheet1' => [
+      {
+        header_a: 'some_value',
+        header_b: 'other_value'
+      },
+      {
+        header_a: 'some_value',
+        header_b: 'other_value'
+      }
+    ]
 }
 ```
 

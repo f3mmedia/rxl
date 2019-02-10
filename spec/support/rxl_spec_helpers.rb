@@ -32,6 +32,7 @@ module RxlSpecHelpers
       filepath: "#{args[:path]}/#{key}.xlsx",
       write_hash: {
         empty_file: {},
+        save_as_table: save_as_table_hashes,
         save_with_content: save_with_content_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
@@ -322,6 +323,21 @@ module RxlSpecHelpers
         {
           'header_1' => 'row_2_b',
           'header_3' => 'row_2_d'
+        }
+      ]
+    }
+  end
+
+  def self.save_as_table_hashes
+    {
+      'test' => [
+        {
+          'col_1' => 'r1c1',
+          'col_2' => 'r1c2'
+        },
+        {
+          'col_1' => 'r2c1',
+          'col_2' => 'r2c2'
         }
       ]
     }
