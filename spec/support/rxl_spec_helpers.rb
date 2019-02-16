@@ -136,7 +136,7 @@ module RxlSpecHelpers
         invalid_cell_key: %[invalid cell key at path #{args[:path]}, must be String and in Excel format (eg "A1")],
         non_hash_cell_value: "cell value at path #{args[:path]} must be a Hash",
         non_symbol_cell_hash_key: "cell key at path #{args[:path]} must be a Symbol",
-        invalid_cell_hash_key: %(invalid cell hash key at path #{args[:path]}, valid keys are: [#{args[:valid_cell_keys_string]}])
+        invalid_cell_hash_key: %(invalid cell hash key(s) #{args[:invalid_keys]} at path #{args[:path]})
       }[key]
     }[type]
     raise("no value found for type :#{type} and key :#{key}") unless return_value
@@ -154,90 +154,21 @@ module RxlSpecHelpers
 
   def self.horizontal_and_vertical_alignment_expected_hash
     {
-      'A1' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :left,
-        v_align: :top
-      },
-      'B1' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :center,
-        v_align: :top
-      },
-      'C1' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :right,
-        v_align: :top
-      },
-      'A2' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :left,
-        v_align: :center
-      },
-      'B2' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :center,
-        v_align: :center
-      },
-      'C2' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :right,
-        v_align: :center
-      },
-      'A3' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :left,
-        v_align: :bottom
-      },
-      'B3' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :center,
-        v_align: :bottom
-      },
-      'C3' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: :right,
-        v_align: :bottom
-      },
-      'A4' => {
-        value: 'abc',
-        format: :text,
-        formula: nil,
-        h_align: nil,
-        v_align: :bottom
-      },
-      'B4' => {
-        value: nil,
-        format: :general,
-        formula: nil,
-        h_align: nil,
-        v_align: :bottom
-      },
-      'C4' => {
-        value: nil,
-        format: :general,
-        formula: nil,
-        h_align: nil,
-        v_align: :bottom
-      }
+      'A1' => { h_align: :left, v_align: :top },
+      'B1' => { h_align: :center, v_align: :top },
+      'C1' => { h_align: :right, v_align: :top },
+      'D1' => { h_align: :left, v_align: :top },
+      'E1' => { h_align: :left, v_align: :top },
+      'A2' => { h_align: :left, v_align: :center },
+      'B2' => { h_align: :center, v_align: :center },
+      'C2' => { h_align: :right, v_align: :center },
+      'D2' => { h_align: :left, v_align: :center },
+      'E2' => { h_align: :left, v_align: :center },
+      'A3' => { h_align: :left, v_align: :bottom },
+      'B3' => { h_align: :center, v_align: :bottom },
+      'C3' => { h_align: :right, v_align: :bottom },
+      'D3' => { h_align: :left, v_align: :bottom },
+      'E3' => { h_align: :left, v_align: :bottom }
     }
   end
 
@@ -455,13 +386,6 @@ module RxlSpecHelpers
     }
   end
 
-  def self.read_and_test_cell_values(test, expected_key, worksheet_name, cell_range)
-    path = 'spec/support/static_test_files'
-    read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats, path: path))
-    cell_range = read_hash[worksheet_name].select { |key, _| key[cell_range] }
-    test.expect(cell_range).to test.eq(RxlSpecHelpers.test_data(:expected_hash, expected_key))
-  end
-
   def self.non_string_key_arrays
     [
       [:worksheet_a],
@@ -523,13 +447,6 @@ module RxlSpecHelpers
       A11111111
     ]
     keys + %i[invalid A1]
-  end
-
-  def self.invalid_cell_hash_key_arrays
-    [
-      %i[a b c],
-      %i[value number formula cell]
-    ]
   end
 
 end
