@@ -6,4 +6,4 @@ gemspec
 gem 'awesome_print'
 gem 'mitrush', '>= 0.2.0'
 gem 'rubocop'
-gem 'rubyXL'
+gem 'rubyXL', '3.3.30'
