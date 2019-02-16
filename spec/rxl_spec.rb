@@ -34,6 +34,7 @@ describe Rxl do
           expected.each do |key, value|
             expect(cell_range[key][:format]).to eq(value[:format])
             expect(cell_range[key][:value]).to eq(value[:value])
+            expect(cell_range[key][:decimals]).to eq(value[:decimals]) if value[:decimals]
           end
         end
       end

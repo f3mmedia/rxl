@@ -60,7 +60,8 @@ The format of the excel read hash has the following skeleton:
 Bear in mind the limitations of reading cell formats. Everything is read as a string other than:
 * cells formatted as dates are converted to a DateTime object with the time portion set to midnight
 * cells formatted as times are converted to a DateTime object with the date portion set to 31/12/1899 - unless the cell has a date prefix in which case this is carried in (this will be read as a date format as per below parsing rules)
-* numbers (including floats and percentages) where the cell format is number or percentage are read in as integers - trailing zeroes are cropped from floats in this case and percentages are converted to numeric format (eg 100% = 1)
+* percentages are converted to numeric format (eg 100% = 1)
+* to account for floats, which lose any trailing zeroes, decimal point information is retained in the `:decimals` value
 * formulas are not read from cells with date and time formats
 
 Within these limitations the cell hash's :format holds the best analysis of the original cell format but as there's no way to extract all of the format information directly from the sheet some information may need to be refurbished as required after import via Rxl.

@@ -8,10 +8,12 @@ module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell = nil)
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
+    format = hash_cell_format(rubyxl_cell_value)
     {
         value: rubyxl_cell_value,
-        format: hash_cell_format(rubyxl_cell_value),
+        format: format,
         formula: rubyxl_cell_formula(rubyxl_cell),
+        decimals: format == :number ? decimals(rubyxl_cell) : nil,
         h_align: rubyxl_cell_h_align(rubyxl_cell),
         v_align: rubyxl_cell_v_align(rubyxl_cell),
         bold: rubyxl_cell.nil? ? false : rubyxl_cell.is_bolded,
@@ -20,6 +22,14 @@ module Cell
         font_size: rubyxl_cell.nil? ? 12 : rubyxl_cell.font_size.to_i,
         border: rubyxl_cell_to_border_hash(rubyxl_cell)
     }
+  end
+
+  def self.decimals(rubyxl_cell)
+    number_format = rubyxl_cell.number_format
+    return nil unless number_format
+    format_code = number_format.format_code
+    i = format_code.reverse.index('.')
+    format_code[0 - i..-1].length if i
   end
 
   def self.rubyxl_cell_to_border_hash(rubyxl_cell)

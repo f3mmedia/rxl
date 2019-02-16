@@ -1,15 +1,5 @@
 module RxlSpecHelpers
 
-  def self.hash_cell_template
-    {
-      value: nil,
-      format: :general,
-      formula: nil,
-      h_align: nil,
-      v_align: :bottom
-    }
-  end
-
   def self.create_temp_xlsx_dir_unless_exists
     path = Pathname.new(ENV['TEMP_XLSX_PATH'])
     FileUtils.mkdir(path.to_s) unless path.exist?
@@ -38,96 +28,7 @@ module RxlSpecHelpers
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
-      expected_hash: {
-        empty_file: { 'Sheet1' => {} },
-        test_file: { 'Sheet1' => {} },
-        test_table_file: { 'Sheet1' => [] },
-        worksheet_names: {
-          'test_a' => {},
-          'test_b' => {}
-        },
-        cell_raw_string_read: {
-          'B2' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'B3' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'B4' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'B5' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'B6' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'B7' => hash_cell_template.merge(value: 'abcde', format: :text)
-        },
-        cell_raw_number_read: {
-          'B2' => hash_cell_template.merge(value: 12345, format: :number),
-          'B3' => hash_cell_template.merge(value: '12345', format: :text),
-          'B4' => hash_cell_template.merge(value: 12345, format: :number)
-        },
-        cell_raw_float_read: {
-          'B3' => hash_cell_template.merge(value: '123.45', format: :text),
-          'B4' => hash_cell_template.merge(value: 123.45, format: :number)
-        },
-        cell_raw_date_read: {
-          'B3' => hash_cell_template.merge(value: '01/01/2000', format: :text),
-          'B5' => hash_cell_template.merge(value: DateTime.parse('01/01/2000'), format: :date),
-          'B6' => hash_cell_template.merge(value: DateTime.parse('01/01/2000'), format: :date),
-          'B7' => hash_cell_template.merge(value: '01/01/2000%', format: :text)
-        },
-        cell_raw_time_read: {
-          'B3' => hash_cell_template.merge(value: '10:15:30', format: :text),
-          'B6' => hash_cell_template.merge(value: DateTime.parse('31/12/1899 10:15:30'), format: :time),
-          'B7' => hash_cell_template.merge(value: '10:15:30%', format: :text)
-        },
-        cell_raw_percentage_read: {
-          'B3' => hash_cell_template.merge(value: '100%', format: :text),
-          'B7' => hash_cell_template.merge(value: 1, format: :number)
-        },
-        cell_raw_percentage_float_read: {
-          'B3' => hash_cell_template.merge(value: '123.45%', format: :text),
-          'B7' => hash_cell_template.merge(value: 1.2345, format: :number)
-        },
-        cell_raw_empty_read: {
-          'B2' => hash_cell_template.merge(format: :general),
-          'B3' => hash_cell_template.merge(format: :general),
-          'B4' => hash_cell_template.merge(format: :general),
-          'B5' => hash_cell_template.merge(format: :general),
-          'B6' => hash_cell_template.merge(format: :general),
-          'B7' => hash_cell_template.merge(format: :general)
-        },
-        cell_formula_string_read: {
-          'C2' => hash_cell_template.merge(value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'),
-          'C3' => hash_cell_template.merge(value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'),
-          'C4' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'C5' => hash_cell_template.merge(value: 'abcde', format: :text),
-          'C6' => hash_cell_template.merge(value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")'),
-          'C7' => hash_cell_template.merge(value: 'abcde', format: :text)
-        },
-        cell_formula_number_read: {
-          'C2' => hash_cell_template.merge(value: 12345, format: :number, formula: '12340+5'),
-          'C3' => hash_cell_template.merge(value: '=12340+5', format: :text),
-          'C4' => hash_cell_template.merge(value: 12345, format: :number, formula: '12340+5')
-        },
-        cell_formula_float_read: {
-          'C3' => hash_cell_template.merge(value: '=123.41+0.04', format: :text),
-          'C4' => hash_cell_template.merge(value: 123.45, format: :number, formula: '123.41+0.04')
-        },
-        cell_formula_date_read: {
-          'C3' => hash_cell_template.merge(value: '=DATE(2000,1,1)', format: :text),
-          'C5' => hash_cell_template.merge(value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)'),
-          'C6' => hash_cell_template.merge(value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)')
-        },
-        cell_formula_time_read: {
-          'C3' => hash_cell_template.merge(value: '=TIME(10,15,30)', format: :text),
-          'C6' => hash_cell_template.merge(value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: 'TIME(10,15,30)')
-        },
-        cell_formula_percentage_read: {
-          'C3' => hash_cell_template.merge(value: '=50%+50%', format: :text),
-          'C7' => hash_cell_template.merge(value: 1, format: :number, formula: '50%+50%')
-        },
-        cell_formula_percentage_float_read: {
-          'C3' => hash_cell_template.merge(value: '=123.41%+0.04%', format: :text),
-          'C7' => hash_cell_template.merge(value: 1.2345, format: :number, formula: '123.41%+0.04%')
-        },
-        horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
-        as_tables: as_tables_expected_hash,
-        tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash
-      }[key],
+      expected_hash: expected_hash(key),
       validation: {
         non_hash_workbook: 'workbook must be a Hash',
         non_string_worksheet_name: 'worksheet name must be a String',
@@ -141,6 +42,107 @@ module RxlSpecHelpers
     }[type]
     raise("no value found for type :#{type} and key :#{key}") unless return_value
     return_value
+  end
+
+  def self.expected_hash(key)
+    {
+      empty_file: { 'Sheet1' => {} },
+      test_file: { 'Sheet1' => {} },
+      test_table_file: { 'Sheet1' => [] },
+      worksheet_names: {
+        'test_a' => {},
+        'test_b' => {}
+      },
+      cell_raw_string_read: {
+        'B2' => { value: 'abcde', format: :text },
+        'B3' => { value: 'abcde', format: :text },
+        'B4' => { value: 'abcde', format: :text },
+        'B5' => { value: 'abcde', format: :text },
+        'B6' => { value: 'abcde', format: :text },
+        'B7' => { value: 'abcde', format: :text }
+      },
+      cell_raw_number_read: {
+        'B2' => { value: 12345, format: :number },
+        'B3' => { value: '12345', format: :text },
+        'B4' => { value: 12345, format: :number }
+      },
+      cell_raw_float_read: {
+        'B3' => { value: '123.45', format: :text },
+        'B4' => { value: 123.45, format: :number, decimals: 2 }
+      },
+      cell_raw_zero_float_read: {
+        'B3' => { value: '123.00', format: :text },
+        'B4' => { value: 123.00, format: :number, decimals: 2 }
+      },
+      cell_raw_date_read: {
+        'B3' => { value: '01/01/2000', format: :text },
+        'B5' => { value: DateTime.parse('01/01/2000'), format: :date },
+        'B6' => { value: DateTime.parse('01/01/2000'), format: :date },
+        'B7' => { value: '01/01/2000%', format: :text }
+      },
+      cell_raw_time_read: {
+        'B3' => { value: '10:15:30', format: :text },
+        'B6' => { value: DateTime.parse('31/12/1899 10:15:30'), format: :time },
+        'B7' => { value: '10:15:30%', format: :text }
+      },
+      cell_raw_percentage_read: {
+        'B3' => { value: '100%', format: :text },
+        'B7' => { value: 1, format: :number }
+      },
+      cell_raw_percentage_float_read: {
+        'B3' => { value: '123.45%', format: :text },
+        'B7' => { value: 1.2345, format: :number }
+      },
+      cell_raw_empty_read: {
+        'B2' => { format: :general },
+        'B3' => { format: :general },
+        'B4' => { format: :general },
+        'B5' => { format: :general },
+        'B6' => { format: :general },
+        'B7' => { format: :general }
+      },
+      cell_formula_string_read: {
+        'C2' => { value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")' },
+        'C3' => { value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")' },
+        'C4' => { value: 'abcde', format: :text },
+        'C5' => { value: 'abcde', format: :text },
+        'C6' => { value: 'abcde', format: :text, formula: 'CONCATENATE("abc","de")' },
+        'C7' => { value: 'abcde', format: :text }
+      },
+      cell_formula_number_read: {
+        'C2' => { value: 12345, format: :number, formula: '12340+5' },
+        'C3' => { value: '=12340+5', format: :text },
+        'C4' => { value: 12345, format: :number, formula: '12340+5' }
+      },
+      cell_formula_float_read: {
+        'C3' => { value: '=123.41+0.04', format: :text },
+        'C4' => { value: 123.45, format: :number, formula: '123.41+0.04', decimals: 2 }
+      },
+      cell_formula_zero_float_read: {
+        'C3' => { value: '=122.41+0.59', format: :text },
+        'C4' => { value: 123.00, format: :number, formula: '122.41+0.59', decimals: 2 }
+      },
+      cell_formula_date_read: {
+        'C3' => { value: '=DATE(2000,1,1)', format: :text },
+        'C5' => { value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)' },
+        'C6' => { value: DateTime.parse('01/01/2000'), format: :date, formula: 'DATE(2000,1,1)' }
+      },
+      cell_formula_time_read: {
+        'C3' => { value: '=TIME(10,15,30)', format: :text },
+        'C6' => { value: DateTime.parse('31/12/1899 10:15:30'), format: :time, formula: 'TIME(10,15,30)' }
+      },
+      cell_formula_percentage_read: {
+        'C3' => { value: '=50%+50%', format: :text },
+        'C7' => { value: 1, format: :number, formula: '50%+50%' }
+      },
+      cell_formula_percentage_float_read: {
+        'C3' => { value: '=123.41%+0.04%', format: :text },
+        'C7' => { value: 1.2345, format: :number, formula: '123.41%+0.04%' }
+      },
+      horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
+      as_tables: as_tables_expected_hash,
+      tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash
+    }[key]
   end
 
   def self.save_with_content_hash
@@ -318,6 +320,11 @@ module RxlSpecHelpers
         cell_range: /^B[3-4]$/,
         description: 'with float input as String :text for text number format, as FixNum :number for number number format'
       },
+      cell_raw_zero_float_read: {
+        worksheet_name: 'zero_float',
+        cell_range: /^B[3-4]$/,
+        description: 'with float input as String :text for text number format, as FixNum :number for number number format'
+      },
       cell_raw_date_read: {
         worksheet_name: 'date',
         cell_range: /^B(3|[5-7])$/,
@@ -360,6 +367,11 @@ module RxlSpecHelpers
       },
       cell_formula_float_read: {
         worksheet_name: 'float',
+        cell_range: /^C[3-4]$/,
+        description: 'with float result as String :text for text number format, as FixNum :number for number number format, and collects formula'
+      },
+      cell_formula_zero_float_read: {
+        worksheet_name: 'zero_float',
         cell_range: /^C[3-4]$/,
         description: 'with float result as String :text for text number format, as FixNum :number for number number format, and collects formula'
       },
