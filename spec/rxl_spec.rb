@@ -40,6 +40,18 @@ describe Rxl do
       end
     end
 
+    it 'reads in cell formats' do
+      path = ENV['TEST_XLSX_FILES']
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_formats, path: path))
+      expect(read_hash['Sheet1']['A1'][:bold]).to eq(true)
+      expect(read_hash['Sheet1']['A2'][:fill]).to eq('ed7d31')
+      expect(read_hash['Sheet1']['A3'][:h_align]).to eq(:center)
+      expect(read_hash['Sheet1']['A4'][:v_align]).to eq(:center)
+      expect(read_hash['Sheet1']['A5'][:font_name]).to eq('Calibri')
+      expect(read_hash['Sheet1']['A6'][:font_size]).to eq(12)
+      expect(read_hash['Sheet1']['A7'][:border]).to eq({ top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' })
+    end
+
     it 'reads horizontal and vertical cell alignment' do
       path = ENV['TEST_XLSX_FILES']
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :horizontal_and_vertical_alignment, path: path))
@@ -186,6 +198,20 @@ describe Rxl do
         expect(read_hash.keys).to eq(['test'])
         expect(read_hash['test']).to be_a(Hash)
         expect(read_hash['test']['A1'][:value]).to eq('r1c1')
+      end
+
+      it 'adds formatting to columns when writing a table' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table_with_formatting)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table_with_formatting, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash['Sheet1']['A1'][:bold]).to be(true)
+        expect(read_hash['Sheet1']['A1'][:h_align]).to eq(:center)
+        expect(read_hash['Sheet1']['B2'][:fill]).to eq('feb302')
       end
     end
 

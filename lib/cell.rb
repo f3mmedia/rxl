@@ -8,12 +8,27 @@ module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell = nil)
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
-    {
+    values = {
         value: rubyxl_cell_value,
         format: hash_cell_format(rubyxl_cell_value),
         formula: rubyxl_cell_formula(rubyxl_cell),
         h_align: rubyxl_cell_horizontal_alignment(rubyxl_cell),
-        v_align: rubyxl_cell_vertical_alignment(rubyxl_cell)
+        v_align: rubyxl_cell_vertical_alignment(rubyxl_cell),
+        bold: rubyxl_cell.is_bolded,
+        fill: rubyxl_cell.fill_color,
+        font_name: rubyxl_cell.font_name,
+        font_size: rubyxl_cell.font_size.to_i,
+        border: rubyxl_cell_to_border_hash(rubyxl_cell)
+    }
+    return values
+  end
+
+  def self.rubyxl_cell_to_border_hash(rubyxl_cell)
+    {
+      top: rubyxl_cell.get_border(:top),
+      bottom: rubyxl_cell.get_border(:bottom),
+      left: rubyxl_cell.get_border(:left),
+      right: rubyxl_cell.get_border(:right)
     }
   end
 
@@ -57,7 +72,7 @@ module Cell
     rubyxl_worksheet[row_index][column_index].change_font_name(combined_hash_cell[:font_style]) if combined_hash_cell[:font_style]
     rubyxl_worksheet[row_index][column_index].change_font_size(combined_hash_cell[:font_size]) if combined_hash_cell[:font_size]
     rubyxl_worksheet[row_index][column_index].change_fill(combined_hash_cell[:fill]) if combined_hash_cell[:fill]
-    rubyxl_worksheet[row_index][column_index].change_horizontal_alignment(combined_hash_cell[:align]) if combined_hash_cell[:align]
+    rubyxl_worksheet[row_index][column_index].change_horizontal_alignment(combined_hash_cell[:h_align]) if combined_hash_cell[:h_align]
     rubyxl_worksheet[row_index][column_index].change_font_bold(combined_hash_cell[:bold]) if combined_hash_cell[:bold]
 
     if combined_hash_cell[:border_all]
@@ -91,9 +106,10 @@ module Cell
     unless hash_cell.keys.reject { |key| key.is_a?(Symbol) }.empty?
       raise("cell key at path #{trace + [hash_cell_key]} must be a Symbol")
     end
-    unless hash_cell.keys.delete_if { |key| valid_cell_keys.include?(key) }.empty?
+    invalid_keys = hash_cell.keys.delete_if { |key| valid_cell_keys.include?(key) }
+    unless invalid_keys.empty?
       valid_cell_keys_string = ":#{valid_cell_keys.join(', :')}"
-      raise(%(invalid cell hash key at path #{trace + [hash_cell_key]}, valid keys are: [#{valid_cell_keys_string}]))
+      raise(%(invalid cell hash key(s) #{invalid_keys} at path #{trace + [hash_cell_key]}, valid keys are: [#{valid_cell_keys_string}]))
     end
     # TODO: add validation for hash_cell specification
   end
@@ -112,6 +128,13 @@ module Cell
       value
       number
       formula
+      bold
+      h_align
+      v_align
+      border
+      fill
+      font_name
+      font_size
     ]
   end
 

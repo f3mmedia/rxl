@@ -28,7 +28,11 @@ module Workbook
 
   def self.hashes_to_hash_workbook(hash_tables, order, write_headers: true)
     hash_workbook = {}
-    hash_tables.each { |k, v| hash_workbook[k] = Worksheet.hashes_to_hash_worksheet(v, order, write_headers: write_headers) }
+    all_formats = hash_tables.delete(:formats) || {}
+    hash_tables.each do |k, v|
+      formats = all_formats[k]
+      hash_workbook[k] = Worksheet.hashes_to_hash_worksheet(v, order, formats, write_headers: write_headers)
+    end
     hash_workbook
   end
 

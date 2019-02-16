@@ -38,22 +38,37 @@ module Worksheet
   ###     GET RUBYXL WORKSHEET FROM HASHES     ###
   ################################################
 
-  def self.hashes_to_hash_worksheet(hashes, order, write_headers: true)
+  def self.hashes_to_hash_worksheet(hashes, order, formats, write_headers: true)
     rows = hashes.map do |hash|
       order.map { |item| hash[item] }
     end
     rows.unshift(order.map { |item| "#{item}" }) if write_headers
-    rows_to_hash_worksheet(rows)
+    hash_worksheet = rows_to_hash_worksheet(rows)
+    format_hash_worksheet(hash_worksheet, formats, write_headers) if formats
+    hash_worksheet
   end
 
   def self.rows_to_hash_worksheet(rows)
-    rxl_worksheet = {}
+    hash_worksheet = {}
     rows.count.times do |i|
       rows[i].each_with_index do |cell_value, index|
-        rxl_worksheet["#{column_name(index)}#{i + 1}"] = { value: cell_value }
+        hash_worksheet["#{column_name(index)}#{i + 1}"] = { value: cell_value }
       end
     end
-    rxl_worksheet
+    hash_worksheet
+  end
+
+  def self.format_hash_worksheet(hash_worksheet, formats, write_headers)
+    if write_headers && formats[:headers]
+      hash_worksheet.keys.grep(/^\D+1$/).each { |key| hash_worksheet[key].update(formats[:headers]) }
+    end
+    formats.keys.each do |col|
+      next if col == :header
+      hash_worksheet.keys.grep(/^#{col}/).each do |key|
+        next if write_headers && key[/^\D+1$/]
+        hash_worksheet[key].update(formats[col])
+      end
+    end
   end
 
 

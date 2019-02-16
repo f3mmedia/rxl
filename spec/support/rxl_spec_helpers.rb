@@ -33,6 +33,7 @@ module RxlSpecHelpers
       write_hash: {
         empty_file: {},
         save_as_table: save_as_table_hashes,
+        save_as_table_with_formatting: save_as_table_with_formatting_hashes,
         save_with_content: save_with_content_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
@@ -338,6 +339,32 @@ module RxlSpecHelpers
         {
           'col_1' => 'r2c1',
           'col_2' => 'r2c2'
+        }
+      ]
+    }
+  end
+
+  def self.save_as_table_with_formatting_hashes
+    {
+      formats: {
+        'Sheet1' => {
+          headers: {
+            bold: true,
+            h_align: 'center'
+          },
+          'B' => {
+            fill: 'feb302'
+          }
+        }
+      },
+      'Sheet1' => [
+        {
+          'col_1' => 'some_value',
+          'col_2' => 'other_value'
+        },
+        {
+          'col_1' => 'some_value',
+          'col_2' => 'other_value'
         }
       ]
     }
