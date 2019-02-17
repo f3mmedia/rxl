@@ -159,23 +159,23 @@ All cells are written with the format set to general by default
 
 If the value is a DateTime object then use `:date_format` with a date format as per the below examples, the default is 'dd/mm/yyyy'
 
-If `:format` is given as `:percentage` where the value is a number or float then the format defaults to a matching format (eg '0' for 1, '0.0' for 0.1), override using `:number_format` if trailing zeroes are required or rounding is needed
+If `:format` is given as `:number` or `:percentage` where the value is a number or float then the format defaults to a matching format (eg '0' for 1, '0.0' for 0.1), override using `:decimals` if trailing zeroes or rounding is needed (nil or 0 values result in no decimal point)
 
 Specify the number format according to https://support.office.com/en-us/article/number-format-codes-5026bbd6-04bc-48cd-bf33-80f18b4eae68?ui=en-US&rs=en-US&ad=US
 
 Examples:
 
-| value        | number_format | resulting cell format | resulting cell value |
-|--------------|---------------|-----------------------|----------------------|
-| 0            | '0'           | number                | 0                    |
-| 0.49         | '0'           | number                | 0                    |
-| 0.5          | '0'           | number                | 1                    |
-| 0            | '0.00'        | number                | 0.00                 |
-| 0.5          | '0.00'        | number                | 0.50                 |
-| 0            |' 0%'          | percentage            | 0%                   |
-| 1            | '0%'          | percentage            | 100%                 |
-| 0.101        | '0.00%'       | percentage            | 10.10%               |
-| 1            | '0.00%'       | percentage            | 100.00%              |
+| value        | decimals | format     | resulting cell value |
+|--------------|----------|------------|----------------------|
+| 0            | 0/nil    | number     | 0                    |
+| 0.49         | 0/nil    | number     | 0                    |
+| 0.5          | 0/nil    | number     | 1                    |
+| 0            | 2        | number     | 0.00                 |
+| 0.5          | 2        | number     | 0.50                 |
+| 0            | 0/nil    | percentage | 0%                   |
+| 1            | 0/nil    | percentage | 100%                 |
+| 0.101        | 2        | percentage | 10.10%               |
+| 1            | 2        | percentage | 100.00%              |
 
 | value        | date_format   | resulting cell format | resulting cell value |
 |--------------|---------------|-----------------------|----------------------|
