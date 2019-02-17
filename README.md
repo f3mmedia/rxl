@@ -153,21 +153,39 @@ The format of the excel hash_workbook has sheet names as keys and hashes of cell
 
 #### Cell specification
 
-All cells are written with the format set to general except those with a number format specified
+##### Output formatting
+
+All cells are written with the format set to general by default
+
+If the value is a DateTime object then use `:date_format` with a date format as per the below examples, the default is 'dd/mm/yyyy'
+
+If `:format` is given as `:percentage` where the value is a number or float then the format defaults to a matching format (eg '0' for 1, '0.0' for 0.1), override using `:number_format` if trailing zeroes are required or rounding is needed
 
 Specify the number format according to https://support.office.com/en-us/article/number-format-codes-5026bbd6-04bc-48cd-bf33-80f18b4eae68?ui=en-US&rs=en-US&ad=US
 
 Examples:
 
-| value        | number format | resulting cell format | resulting cell value |
+| value        | number_format | resulting cell format | resulting cell value |
 |--------------|---------------|-----------------------|----------------------|
-| 0            | 0             | number                | 0                    |
-| 0.49         | 0             | number                | 0                    |
-| 0.5          | 0             | number                | 1                    |
-| 0            | 0.00          | number                | 0.00                 |
-| 0            | 0%            | percentage            | 0%                   |
-| 1            | 0%            | percentage            | 100%                 |
+| 0            | '0'           | number                | 0                    |
+| 0.49         | '0'           | number                | 0                    |
+| 0.5          | '0'           | number                | 1                    |
+| 0            | '0.00'        | number                | 0.00                 |
+| 0.5          | '0.00'        | number                | 0.50                 |
+| 0            |' 0%'          | percentage            | 0%                   |
+| 1            | '0%'          | percentage            | 100%                 |
+| 0.101        | '0.00%'       | percentage            | 10.10%               |
+| 1            | '0.00%'       | percentage            | 100.00%              |
+
+| value        | date_format   | resulting cell format | resulting cell value |
+|--------------|---------------|-----------------------|----------------------|
 | '01/01/2000' | 'dd/mm/yyyy'  | date                  | 01/01/2000           |
+| '01/01/2000' | 'dd-mmm-yyyy' | date                  | 01-Jan-2000          |
+| '01:00:00'   | 'hh:mm:ss'    | time                  | 01:00:00             |
+
+##### Formulas
+
+Formulas are read and written from/to the `:formula` value and on write supercede and value specified, however due to some unknown issue, formulas which were written via this gem can then be re-read but the cell value will be empty
 
 #### Write Validation
 
@@ -181,7 +199,6 @@ The following rules are validated for write_file:
 * The hash_worksheet values must be hashes (specifying cells)
 * The hash_cell keys must conform the the cell specification as below
 
-* If a formula is provided the value must be nil or an empty string
 * If a number format is provided the value must be consistent with it
 
 

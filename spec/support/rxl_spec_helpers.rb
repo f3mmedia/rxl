@@ -26,6 +26,7 @@ module RxlSpecHelpers
         save_as_table_with_formatting: save_as_table_with_formatting_hashes,
         save_with_content: save_with_content_hash,
         save_with_format: save_with_format_hash,
+        save_with_formula: save_with_formula_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
@@ -143,7 +144,8 @@ module RxlSpecHelpers
       horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
       as_tables: as_tables_expected_hash,
       tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash,
-      save_with_format: save_with_format_expected_hash
+      save_with_format: save_with_format_expected_hash,
+      save_with_formula: save_with_formula_expected_hash
     }[key]
   end
 
@@ -289,6 +291,104 @@ module RxlSpecHelpers
       'D10' => { value: nil, format: :general },
       'E10' => { value: nil, format: :general },
       'F10' => { value: nil, format: :general }
+    }
+  end
+
+  def self.save_with_formula_hash
+    date = DateTime.parse('01/01/2001')
+    time = DateTime.parse('01/01/2001T01:00:00')
+    {
+      'sheet' => {
+        'A1' => { value: 'cell_a1', format: :general, formula: 'CONCATENATE("c","a1")' },
+        'B1' => { value: 'cell_b1', format: :text, formula: 'CONCATENATE("c","b1")' },
+        'C1' => { value: 'cell_c1', format: :number, formula: 'CONCATENATE("c","c1")' },
+        'D1' => { value: 'cell_d1', format: :date, formula: 'CONCATENATE("c","d1")' },
+        'E1' => { value: 'cell_e1', format: :time, formula: 'CONCATENATE("c","e1")' },
+        'F1' => { value: 'cell_f1', format: :percentage, formula: 'CONCATENATE("c","f1")' },
+        'A2' => { value: 12345, format: :general, formula: '1234+1' },
+        'B2' => { value: 12345, format: :text, formula: '1234+1' },
+        'C2' => { value: 12345, format: :number, formula: '1234+1' },
+        'D2' => { value: 12345, format: :date, formula: '1234+1' },
+        'E2' => { value: 12345, format: :time, formula: '1234+1' },
+        'F2' => { value: 12345, format: :percentage, formula: '1234+1' },
+        'A3' => { value: 123.45, format: :general, formula: '123.12+0.23' },
+        'B3' => { value: 123.45, format: :text, formula: '123.12+0.23' },
+        'C3' => { value: 123.45, format: :number, formula: '123.12+0.23' },
+        'D3' => { value: 123.45, format: :date, formula: '123.12+0.23' },
+        'E3' => { value: 123.45, format: :time, formula: '123.12+0.23' },
+        'F3' => { value: 123.45, format: :percentage, formula: '123.12+0.23' },
+        'A4' => { value: 123.00, format: :general, formula: '123.12+0.88' },
+        'B4' => { value: 123.00, format: :text, formula: '123.12+0.88' },
+        'C4' => { value: 123.00, format: :number, formula: '123.12+0.88' },
+        'D4' => { value: 123.00, format: :date, formula: '123.12+0.88' },
+        'E4' => { value: 123.00, format: :time, formula: '123.12+0.88' },
+        'F4' => { value: 123.00, format: :percentage, formula: '123.12+0.88' },
+        'A5' => { value: 123.00, format: :general, decimals: 2, formula: '123.12+0.88' },
+        'B5' => { value: 123.00, format: :text, decimals: 2, formula: '123.12+0.88' },
+        'C5' => { value: 123.00, format: :number, decimals: 2, formula: '123.12+0.88' },
+        'D5' => { value: 123.00, format: :date, decimals: 2, formula: '123.12+0.88' },
+        'E5' => { value: 123.00, format: :time, decimals: 2, formula: '123.12+0.88' },
+        'F5' => { value: 123.00, format: :percentage, decimals: 2, formula: '123.12+0.88' },
+        'A6' => { value: date, format: :general, formula: 'DATE(2002,2,2)' },
+        'B6' => { value: date, format: :text, formula: 'DATE(2002,2,2)' },
+        'C6' => { value: date, format: :number, formula: 'DATE(2002,2,2)' },
+        'D6' => { value: date, format: :date, formula: 'DATE(2002,2,2)' },
+        'E6' => { value: date, format: :time, formula: 'DATE(2002,2,2)' },
+        'F6' => { value: date, format: :percentage, formula: 'DATE(2002,2,2)' },
+        'A7' => { value: time, format: :general, formula: 'TIME(10,15,30)' },
+        'B7' => { value: time, format: :text, formula: 'TIME(10,15,30)' },
+        'C7' => { value: time, format: :number, formula: 'TIME(10,15,30)' },
+        'D7' => { value: time, format: :date, formula: 'TIME(10,15,30)' },
+        'E7' => { value: time, format: :time, formula: 'TIME(10,15,30)' },
+        'F7' => { value: time, format: :percentage, formula: 'TIME(10,15,30)' }
+      }
+    }
+  end
+
+  def self.save_with_formula_expected_hash
+    {
+      'A1' => { value: '', format: :text, formula: 'CONCATENATE("c","a1")' },
+      'B1' => { value: '', format: :text, formula: 'CONCATENATE("c","b1")' },
+      'C1' => { value: '', format: :text, formula: 'CONCATENATE("c","c1")' },
+      'D1' => { value: '', format: :text, formula: 'CONCATENATE("c","d1")' },
+      'E1' => { value: '', format: :text, formula: 'CONCATENATE("c","e1")' },
+      'F1' => { value: '', format: :text, formula: 'CONCATENATE("c","f1")' },
+      'A2' => { value: '', format: :text, formula: '1234+1' },
+      'B2' => { value: '', format: :text, formula: '1234+1' },
+      'C2' => { value: '', format: :text, formula: '1234+1' },
+      'D2' => { value: '', format: :text, formula: '1234+1' },
+      'E2' => { value: '', format: :text, formula: '1234+1' },
+      'F2' => { value: '', format: :text, formula: '1234+1' },
+      'A3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'B3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'C3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'D3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'E3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'F3' => { value: '', format: :text, formula: '123.12+0.23' },
+      'A4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'B4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'C4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'D4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'E4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'F4' => { value: '', format: :text, formula: '123.12+0.88' },
+      'A5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'B5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'C5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'D5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'E5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'F5' => { value: '', format: :text, formula: '123.12+0.88' },
+      'A6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'B6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'C6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'D6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'E6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'F6' => { value: '', format: :text, formula: 'DATE(2002,2,2)' },
+      'A7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
+      'B7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
+      'C7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
+      'D7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
+      'E7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
+      'F7' => { value: '', format: :text, formula: 'TIME(10,15,30)' }
     }
   end
 

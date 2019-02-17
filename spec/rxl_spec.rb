@@ -206,7 +206,21 @@ describe Rxl do
           expect({ key => read_hash['sheet'][key][:value] }).to eq({ key => value[:value] })
           expect({ key => read_hash['sheet'][key][:format] }).to eq({ key => value[:format] })
         end
+      end
 
+      it 'saves a file with formula values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_formula)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_formula, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_formula)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          expect({ key => read_hash['sheet'][key][:value] }).to eq({ key => value[:value] })
+          expect({ key => read_hash['sheet'][key][:format] }).to eq({ key => value[:format] })
+          expect({ key => read_hash['sheet'][key][:formula] }).to eq({ key => value[:formula] })
+        end
       end
 
       it 'saves an array of hashes as a table' do
