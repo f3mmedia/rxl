@@ -8,20 +8,27 @@ module Cell
 
   def self.rubyxl_cell_to_hash_cell(rubyxl_cell = nil)
     rubyxl_cell_value = rubyxl_cell.nil? ? RubyXL::Cell.new.value : rubyxl_cell.value
+    rubyxl_cell_value = resolve_date_ms(rubyxl_cell_value) if rubyxl_cell_value.is_a?(Date)
     format = hash_cell_format(rubyxl_cell_value)
     {
-        value: rubyxl_cell_value,
-        format: format,
-        formula: rubyxl_cell_formula(rubyxl_cell),
-        decimals: format == :number ? decimals(rubyxl_cell) : nil,
-        h_align: rubyxl_cell_h_align(rubyxl_cell),
-        v_align: rubyxl_cell_v_align(rubyxl_cell),
-        bold: rubyxl_cell.nil? ? false : rubyxl_cell.is_bolded,
-        fill: rubyxl_cell.nil? ? 'ffffff' : rubyxl_cell.fill_color,
-        font_name: rubyxl_cell.nil? ? 'Calibri' : rubyxl_cell.font_name,
-        font_size: rubyxl_cell.nil? ? 12 : rubyxl_cell.font_size.to_i,
-        border: rubyxl_cell_to_border_hash(rubyxl_cell)
+      value: rubyxl_cell_value,
+      format: format,
+      formula: rubyxl_cell_formula(rubyxl_cell),
+      decimals: format == :number ? decimals(rubyxl_cell) : nil,
+      h_align: rubyxl_cell_h_align(rubyxl_cell),
+      v_align: rubyxl_cell_v_align(rubyxl_cell),
+      bold: rubyxl_cell.nil? ? false : rubyxl_cell.is_bolded,
+      fill: rubyxl_cell.nil? ? 'ffffff' : rubyxl_cell.fill_color,
+      font_name: rubyxl_cell.nil? ? 'Calibri' : rubyxl_cell.font_name,
+      font_size: rubyxl_cell.nil? ? 12 : rubyxl_cell.font_size.to_i,
+      border: rubyxl_cell_to_border_hash(rubyxl_cell)
     }
+  end
+
+  def self.resolve_date_ms(value)
+    value_ut = value.strftime('%s')
+    ut = value.strftime('%L').to_i > 499 ? "#{value_ut.to_i + 1}" : value_ut
+    DateTime.strptime(ut, '%s')
   end
 
   def self.decimals(rubyxl_cell)
@@ -92,12 +99,55 @@ module Cell
     end
   end
 
-  def self.add_rubyxl_cells(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
-    if combined_hash_cell[:formula]
-      rubyxl_worksheet.add_cell(row_index, column_index, '', combined_hash_cell[:formula]).set_number_format combined_hash_cell[:dp_2]
+  def self.add_rubyxl_cells(hash_cell, rubyxl_worksheet, row_index, column_index)
+    number_format = write_format(hash_cell)
+    if hash_cell[:formula]
+      if number_format
+        rubyxl_worksheet.add_cell(row_index, column_index, '', hash_cell[:formula])
+          .set_number_format(number_format)
+      else
+        rubyxl_worksheet.add_cell(row_index, column_index, '', hash_cell[:formula])
+      end
     else
-      rubyxl_worksheet.add_cell(row_index, column_index, combined_hash_cell[:value])
+      if number_format
+        cell_value = hash_cell[:value].is_a?(Date) ? date_to_num(hash_cell[:value]) : hash_cell[:value]
+        rubyxl_worksheet.add_cell(row_index, column_index, cell_value)
+          .set_number_format(number_format)
+      else
+        rubyxl_worksheet.add_cell(row_index, column_index, hash_cell[:value])
+      end
     end
+  end
+
+  def self.write_format(hash_cell)
+    case hash_cell[:format]
+    when :number
+      hash_cell[:decimals] ? "0.#{ '0' * hash_cell[:decimals] }" : '0'
+    when :date
+      hash_cell[:date_format] ? hash_cell[:date_format] : 'dd/mm/yyyy'
+    when :time
+      hash_cell[:date_format] ? hash_cell[:date_format] : 'hh:mm:ss'
+    when :percentage
+      hash_cell[:decimals] ? "0.#{ '0' * hash_cell[:decimals] }%" : '0%'
+    else
+      case hash_cell[:value].class.to_s
+      when 'Fixnum'
+        '0'
+      when 'Float'
+        value = hash_cell[:value].to_s
+        decimals = value[value.index('.') + 1..-1].length
+        "0.#{ '0' * decimals }"
+      when 'DateTime'
+        return 'dd/mm/yyyy hh:mm:ss'
+      else
+        nil
+      end
+    end
+  end
+
+  def self.date_to_num(date)
+    workbook = RubyXL::Workbook.new
+    workbook.date_to_num(date)
   end
 
 
@@ -134,8 +184,10 @@ module Cell
   def self.valid_cell_keys
     %i[
       value
-      number
+      format
+      date_format
       formula
+      decimals
       bold
       h_align
       v_align

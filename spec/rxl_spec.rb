@@ -194,6 +194,21 @@ describe Rxl do
         expect(read_hash['first_sheet']['A1'][:value]).to eq('cell_a1')
       end
 
+      it 'saves a file with format values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_format)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_format, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_format)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          expect({ key => read_hash['sheet'][key][:value] }).to eq({ key => value[:value] })
+          expect({ key => read_hash['sheet'][key][:format] }).to eq({ key => value[:format] })
+        end
+
+      end
+
       it 'saves an array of hashes as a table' do
         path = ENV['TEMP_XLSX_PATH']
         save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
@@ -321,7 +336,7 @@ describe Rxl do
       context 'the cell hash contains invalid keys' do
         tests = [
           { cell_hash: { a: nil, b: nil, c: nil }, invalid_keys: %i[a b c] },
-          { cell_hash: { value: nil, number: nil, formula: nil, cell: nil }, invalid_keys: %i[cell] }
+          { cell_hash: { value: nil, number: nil, formula: nil, cell: nil }, invalid_keys: %i[number cell] }
         ]
         tests.each_with_index do |test, i|
           it "[example ##{i + 1}]" do

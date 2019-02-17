@@ -25,6 +25,7 @@ module RxlSpecHelpers
         save_as_table: save_as_table_hashes,
         save_as_table_with_formatting: save_as_table_with_formatting_hashes,
         save_with_content: save_with_content_hash,
+        save_with_format: save_with_format_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
       }[key],
@@ -141,7 +142,8 @@ module RxlSpecHelpers
       },
       horizontal_and_vertical_alignment: horizontal_and_vertical_alignment_expected_hash,
       as_tables: as_tables_expected_hash,
-      tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash
+      tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash,
+      save_with_format: save_with_format_expected_hash
     }[key]
   end
 
@@ -151,6 +153,142 @@ module RxlSpecHelpers
         'A1' => { value: 'cell_a1' },
         'A2' => { value: 'cell_a2' }
       }
+    }
+  end
+
+  def self.save_with_format_hash
+    date = DateTime.parse('01/01/2001')
+    time = DateTime.parse('01/01/2001T01:00:00')
+    {
+      'sheet' => {
+        'A1' => { value: 'cell_a1', format: :general },
+        'B1' => { value: 'cell_b1', format: :text },
+        'C1' => { value: 'cell_c1', format: :number },
+        'D1' => { value: 'cell_d1', format: :date },
+        'E1' => { value: 'cell_e1', format: :time },
+        'F1' => { value: 'cell_f1', format: :percentage },
+        'A2' => { value: 12345, format: :general },
+        'B2' => { value: 12345, format: :text },
+        'C2' => { value: 12345, format: :number },
+        'D2' => { value: 12345, format: :date },
+        'E2' => { value: 12345, format: :time },
+        'F2' => { value: 12345, format: :percentage },
+        'A3' => { value: 123.45, format: :general },
+        'B3' => { value: 123.45, format: :text },
+        'C3' => { value: 123.45, format: :number },
+        'D3' => { value: 123.45, format: :date },
+        'E3' => { value: 123.45, format: :time },
+        'F3' => { value: 123.45, format: :percentage },
+        'A4' => { value: 123.00, format: :general },
+        'B4' => { value: 123.00, format: :text },
+        'C4' => { value: 123.00, format: :number },
+        'D4' => { value: 123.00, format: :date },
+        'E4' => { value: 123.00, format: :time },
+        'F4' => { value: 123.00, format: :percentage },
+        'A5' => { value: 123.00, format: :general, decimals: 2 },
+        'B5' => { value: 123.00, format: :text, decimals: 2 },
+        'C5' => { value: 123.00, format: :number, decimals: 2 },
+        'D5' => { value: 123.00, format: :date, decimals: 2 },
+        'E5' => { value: 123.00, format: :time, decimals: 2 },
+        'F5' => { value: 123.00, format: :percentage, decimals: 2 },
+        'A6' => { value: date, format: :general },
+        'B6' => { value: date, format: :text },
+        'C6' => { value: date, format: :number },
+        'D6' => { value: date, format: :date },
+        'E6' => { value: date, format: :time },
+        'F6' => { value: date, format: :percentage },
+        'A7' => { value: date, format: :general, date_format: 'dd/mm/yyyy' },
+        'B7' => { value: date, format: :text, date_format: 'dd/mm/yyyy' },
+        'C7' => { value: date, format: :number, date_format: 'dd/mm/yyyy' },
+        'D7' => { value: date, format: :date, date_format: 'dd/mm/yyyy' },
+        'E7' => { value: date, format: :time, date_format: 'dd/mm/yyyy' },
+        'F7' => { value: date, format: :percentage, date_format: 'dd/mm/yyyy' },
+        'A8' => { value: date, format: :general, date_format: 'ddd/mm/yyyy' },
+        'B8' => { value: date, format: :text, date_format: 'ddd/mm/yyyy' },
+        'C8' => { value: date, format: :number, date_format: 'ddd/mm/yyyy' },
+        'D8' => { value: date, format: :date, date_format: 'ddd/mm/yyyy' },
+        'E8' => { value: date, format: :time, date_format: 'ddd/mm/yyyy' },
+        'F8' => { value: date, format: :percentage, date_format: 'ddd/mm/yyyy' },
+        'A9' => { value: time, format: :general },
+        'B9' => { value: time, format: :text },
+        'C9' => { value: time, format: :number },
+        'D9' => { value: time, format: :date },
+        'E9' => { value: time, format: :time },
+        'F9' => { value: time, format: :percentage },
+        'A10' => { value: nil, format: :general },
+        'B10' => { value: nil, format: :text },
+        'C10' => { value: nil, format: :number },
+        'D10' => { value: nil, format: :date },
+        'E10' => { value: nil, format: :time },
+        'F10' => { value: nil, format: :percentage }
+      }
+    }
+  end
+
+  def self.save_with_format_expected_hash
+    date = DateTime.parse('01/01/2001')
+    time = DateTime.parse('01/01/2001T01:00:00')
+    {
+      'A1' => { value: 'cell_a1', format: :text },
+      'B1' => { value: 'cell_b1', format: :text },
+      'C1' => { value: 'cell_c1', format: :text },
+      'D1' => { value: 'cell_d1', format: :text },
+      'E1' => { value: 'cell_e1', format: :text },
+      'F1' => { value: 'cell_f1', format: :text },
+      'A2' => { value: 12345, format: :number },
+      'B2' => { value: 12345, format: :number },
+      'C2' => { value: 12345, format: :number },
+      'D2' => { value: DateTime.parse('18/10/1933'), format: :date },
+      'E2' => { value: DateTime.parse('18/10/1933'), format: :date },
+      'F2' => { value: 12345, format: :number },
+      'A3' => { value: 123.45, format: :number },
+      'B3' => { value: 123.45, format: :number },
+      'C3' => { value: 123.45, format: :number },
+      'D3' => { value: DateTime.parse('02/05/1900 10:48:00'), format: :date },
+      'E3' => { value: DateTime.parse('02/05/1900 10:48:00'), format: :date },
+      'F3' => { value: 123.45, format: :number },
+      'A4' => { value: 123.00, format: :number },
+      'B4' => { value: 123.00, format: :number },
+      'C4' => { value: 123.00, format: :number },
+      'D4' => { value: DateTime.parse('02/05/1900'), format: :date },
+      'E4' => { value: DateTime.parse('02/05/1900'), format: :date },
+      'F4' => { value: 123.00, format: :number },
+      'A5' => { value: 123.00, format: :number, decimals: 2 },
+      'B5' => { value: 123.00, format: :number, decimals: 2 },
+      'C5' => { value: 123.00, format: :number, decimals: 2 },
+      'D5' => { value: DateTime.parse('02/05/1900'), format: :date },
+      'E5' => { value: DateTime.parse('02/05/1900'), format: :date },
+      'F5' => { value: 123.00, format: :number, decimals: 2 },
+      'A6' => { value: date, format: :date },
+      'B6' => { value: date, format: :date },
+      'C6' => { value: 36892.0, format: :number },
+      'D6' => { value: date, format: :date },
+      'E6' => { value: date, format: :date },
+      'F6' => { value: 36892.0, format: :number },
+      'A7' => { value: date, format: :date },
+      'B7' => { value: date, format: :date },
+      'C7' => { value: 36892.0, format: :number },
+      'D7' => { value: date, format: :date },
+      'E7' => { value: date, format: :date },
+      'F7' => { value: 36892.0, format: :number },
+      'A8' => { value: date, format: :date },
+      'B8' => { value: date, format: :date },
+      'C8' => { value: 36892.0, format: :number },
+      'D8' => { value: date, format: :date },
+      'E8' => { value: date, format: :date },
+      'F8' => { value: 36892.0, format: :number },
+      'A9' => { value: time, format: :date },
+      'B9' => { value: time, format: :date },
+      'C9' => { value: 36892.041666666664, format: :number },
+      'D9' => { value: time, format: :date },
+      'E9' => { value: time, format: :date },
+      'F9' => { value: 36892.041666666664, format: :number },
+      'A10' => { value: nil, format: :general },
+      'B10' => { value: nil, format: :general },
+      'C10' => { value: nil, format: :general },
+      'D10' => { value: nil, format: :general },
+      'E10' => { value: nil, format: :general },
+      'F10' => { value: nil, format: :general }
     }
   end
 
