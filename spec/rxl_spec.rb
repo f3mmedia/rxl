@@ -27,7 +27,15 @@ describe Rxl do
     context 'reads cell raw values' do
       RxlSpecHelpers.raw_cell_value_test_data_hash.each do |expected_key, value_hash|
         it value_hash[:description] do
-          RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+          path = 'spec/support/static_test_files'
+          read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats, path: path))
+          cell_range = read_hash[value_hash[:worksheet_name]]
+          expected = RxlSpecHelpers.test_data(:expected_hash, expected_key)
+          expected.each do |key, value|
+            expect(cell_range[key][:format]).to eq(value[:format])
+            expect(cell_range[key][:value]).to eq(value[:value])
+            expect(cell_range[key][:decimals]).to eq(value[:decimals]) if value[:decimals]
+          end
         end
       end
     end
@@ -35,15 +43,41 @@ describe Rxl do
     context 'reads cell formula values' do
       RxlSpecHelpers.formula_cell_value_test_data_hash.each do |expected_key, value_hash|
         it value_hash[:description] do
-          RxlSpecHelpers.read_and_test_cell_values(self, expected_key, value_hash[:worksheet_name], value_hash[:cell_range])
+          path = 'spec/support/static_test_files'
+          read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_values_and_formats, path: path))
+          cell_range = read_hash[value_hash[:worksheet_name]]
+          expected = RxlSpecHelpers.test_data(:expected_hash, expected_key)
+          expected.each do |key, value|
+            expect(cell_range[key][:format]).to eq(value[:format])
+            expect(cell_range[key][:value]).to eq(value[:value])
+            expect(cell_range[key][:formula]).to eq(value[:formula])
+          end
         end
       end
+    end
+
+    it 'reads in cell formats' do
+      path = ENV['TEST_XLSX_FILES']
+      read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :cell_formats, path: path))
+      expect(read_hash['Sheet1']['A1'][:bold]).to eq(true)
+      expect(read_hash['Sheet1']['A2'][:fill]).to eq('ed7d31')
+      expect(read_hash['Sheet1']['A3'][:h_align]).to eq(:center)
+      expect(read_hash['Sheet1']['A4'][:v_align]).to eq(:center)
+      expect(read_hash['Sheet1']['A5'][:font_name]).to eq('Calibri')
+      expect(read_hash['Sheet1']['A6'][:font_size]).to eq(12)
+      expect(read_hash['Sheet1']['A7'][:border]).to eq({ top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' })
     end
 
     it 'reads horizontal and vertical cell alignment' do
       path = ENV['TEST_XLSX_FILES']
       read_hash = Rxl.read_file(RxlSpecHelpers.test_data(:filepath, :horizontal_and_vertical_alignment, path: path))
-      expect(read_hash['values']).to eq(RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment))
+      expected = RxlSpecHelpers.test_data(:expected_hash, :horizontal_and_vertical_alignment)
+      expect(read_hash['values'].keys).to eq(expected.keys)
+      expected.each do |key, value|
+        %i[h_align v_align].each do |alignment_key|
+          expect(read_hash['values'][key][alignment_key]).to eq(value[alignment_key])
+        end
+      end
     end
 
     context 'when reading workbook as tables' do
@@ -159,16 +193,102 @@ describe Rxl do
         expect(read_hash['first_sheet'].keys).to eq(%w[A1 A2])
         expect(read_hash['first_sheet']['A1'][:value]).to eq('cell_a1')
       end
+
+      it 'saves a file with format values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_format)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_format, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_format)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          expect({ key => read_hash['sheet'][key][:value] }).to eq({ key => value[:value] })
+          expect({ key => read_hash['sheet'][key][:format] }).to eq({ key => value[:format] })
+        end
+      end
+
+      it 'saves a file with formula values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_formula)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_formula, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_formula)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          expect({ key => read_hash['sheet'][key][:value] }).to eq({ key => value[:value] })
+          expect({ key => read_hash['sheet'][key][:format] }).to eq({ key => value[:format] })
+          expect({ key => read_hash['sheet'][key][:formula] }).to eq({ key => value[:formula] })
+        end
+      end
+
+      it 'saves a file with formatting values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_formatting)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_formatting, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_formatting)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          value.each do |attr_key, attr_value|
+            expect({ key => read_hash['sheet'][key][attr_key] }).to eq({ key => attr_value })
+          end
+        end
+      end
+
+      it 'saves an array of hashes as a table' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file_as_tables(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(['test'])
+        expect(read_hash['test']).to be_a(Array)
+        expect(read_hash).to eq(save_hash)
+      end
+
+      it 'saves an array of hashes as a table without headers' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order, write_headers: false)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash.keys).to eq(['test'])
+        expect(read_hash['test']).to be_a(Hash)
+        expect(read_hash['test']['A1'][:value]).to eq('r1c1')
+      end
+
+      it 'adds formatting to columns when writing a table' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table_with_formatting)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table_with_formatting, path: path)
+        order = %w[col_1 col_2]
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        expect(error).to be_nil
+        read_hash = Rxl.read_file(save_filepath)
+        expect(read_hash).to be_a(Hash)
+        expect(read_hash['Sheet1']['A1'][:bold]).to be(true)
+        expect(read_hash['Sheet1']['A1'][:h_align]).to eq(:center)
+        expect(read_hash['Sheet1']['B2'][:fill]).to eq('feb302')
+      end
     end
 
     context 'it returns an exception where' do
       context 'the workbook is not a hash' do
         non_hash_values = RxlSpecHelpers.example_class_values.delete_if { |value| value.is_a?(Hash) }
-        non_hash_values.each_with_index do |hash_workbook_input, i|
+        non_hash_values.each_with_index do |write_hash, i|
           it "[example ##{i + 1}]" do
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_hash_workbook))
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            msg = RxlSpecHelpers.test_data(:validation, :non_hash_workbook)
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -176,10 +296,10 @@ describe Rxl do
       context 'the workbook contains non-string keys' do
         RxlSpecHelpers.non_string_key_arrays.each_with_index do |key_array, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :non_string_worksheet_name))
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
+            msg = RxlSpecHelpers.test_data(:validation, :non_string_worksheet_name)
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -187,10 +307,10 @@ describe Rxl do
       context 'the workbook contains an empty string key' do
         RxlSpecHelpers.empty_string_key_arrays.each_with_index do |key_array, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expect(exception.message).to eq(RxlSpecHelpers.test_data(:validation, :empty_string_worksheet_name))
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = key_array.each_with_object({}) { |key, hash| hash[key] = {} }
+            msg = RxlSpecHelpers.test_data(:validation, :empty_string_worksheet_name)
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -200,10 +320,9 @@ describe Rxl do
         non_hash_values.each_with_index do |worksheet_input, i|
           it "[example ##{i + 1}]" do
             filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
-            exception = Rxl.write_file(filepath, {'worksheet_a' => worksheet_input})
-            expect(exception.class).to eq(RuntimeError)
-            expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_worksheet, path: ['worksheet_a'])
-            expect(exception.message).to eq(expected_message)
+            write_hash = {'worksheet_a' => worksheet_input}
+            msg = RxlSpecHelpers.test_data(:validation, :non_hash_worksheet, path: ['worksheet_a'])
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -211,11 +330,10 @@ describe Rxl do
       context 'the worksheet contains keys that are not valid excel cell keys' do
         RxlSpecHelpers.invalid_string_cell_keys.each_with_index do |key, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = { 'worksheet_a' => { key => {} } }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_key, path: ['worksheet_a'])
-            expect(exception.message).to eq(expected_message)
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = { 'worksheet_a' => { key => {} } }
+            msg = RxlSpecHelpers.test_data(:validation, :invalid_cell_key, path: ['worksheet_a'])
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -224,11 +342,10 @@ describe Rxl do
         non_hash_values = RxlSpecHelpers.example_class_values.delete_if { |value| value.is_a?(Hash) }
         non_hash_values.each_with_index do |cell_value, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = { 'worksheet_a' => { 'A1' => cell_value } }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expected_message = RxlSpecHelpers.test_data(:validation, :non_hash_cell_value, path: ['worksheet_a', 'A1'])
-            expect(exception.message).to eq(expected_message)
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = { 'worksheet_a' => { 'A1' => cell_value } }
+            msg = RxlSpecHelpers.test_data(:validation, :non_hash_cell_value, path: ['worksheet_a', 'A1'])
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
@@ -237,25 +354,29 @@ describe Rxl do
         non_symbol_values = RxlSpecHelpers.example_class_values.reject { |value| value.is_a?(Symbol) }
         non_symbol_values.each_with_index do |key, i|
           it "[example ##{i + 1}]" do
-            hash_workbook_input = { 'worksheet_a' => { 'A1' => { key => nil } } }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            expected_message = RxlSpecHelpers.test_data(:validation, :non_symbol_cell_hash_key, path: ['worksheet_a', 'A1'])
-            expect(exception.message).to eq(expected_message)
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = { 'worksheet_a' => { 'A1' => { key => nil } } }
+            msg = RxlSpecHelpers.test_data(:validation, :non_symbol_cell_hash_key, path: ['worksheet_a', 'A1'])
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end
 
       context 'the cell hash contains invalid keys' do
-        RxlSpecHelpers.invalid_cell_hash_key_arrays.each_with_index do |key_array, i|
+        tests = [
+          { cell_hash: { a: nil, b: nil, c: nil }, invalid_keys: %i[a b c] },
+          { cell_hash: { value: nil, number: nil, formula: nil, cell: nil }, invalid_keys: %i[number cell] }
+        ]
+        tests.each_with_index do |test, i|
           it "[example ##{i + 1}]" do
-            cell_hash = key_array.each_with_object({}) { |key, hash| hash[key] = nil }
-            hash_workbook_input = { 'worksheet_a' => { 'A1' => cell_hash } }
-            exception = Rxl.write_file(RxlSpecHelpers.test_data(:filepath, :hash_validation), hash_workbook_input)
-            expect(exception.class).to eq(RuntimeError)
-            args = { path: ['worksheet_a', 'A1'], valid_cell_keys_string: ':value, :number, :formula' }
-            expected_message = RxlSpecHelpers.test_data(:validation, :invalid_cell_hash_key, args)
-            expect(exception.message).to eq(expected_message)
+            filepath = RxlSpecHelpers.test_data(:filepath, :hash_validation)
+            write_hash = { 'worksheet_a' => { 'A1' => test[:cell_hash] } }
+            args = {
+              path: %w[worksheet_a A1],
+              invalid_keys: test[:invalid_keys]
+            }
+            msg = RxlSpecHelpers.test_data(:validation, :invalid_cell_hash_key, args)
+            expect { Rxl.write_file(filepath, write_hash) }.to raise_error(msg)
           end
         end
       end

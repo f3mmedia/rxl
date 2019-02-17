@@ -42,7 +42,7 @@ The format of the excel read hash has the following skeleton:
 
 ```ruby
 {
-    "Sheet1" => {
+    'Sheet1' => {
       row_count: 1,
       column_count: 1,
       rows: {},
@@ -60,7 +60,8 @@ The format of the excel read hash has the following skeleton:
 Bear in mind the limitations of reading cell formats. Everything is read as a string other than:
 * cells formatted as dates are converted to a DateTime object with the time portion set to midnight
 * cells formatted as times are converted to a DateTime object with the date portion set to 31/12/1899 - unless the cell has a date prefix in which case this is carried in (this will be read as a date format as per below parsing rules)
-* numbers (including floats and percentages) where the cell format is number or percentage are read in as integers - trailing zeroes are cropped from floats in this case and percentages are converted to numeric format (eg 100% = 1)
+* percentages are converted to numeric format (eg 100% = 1)
+* to account for floats, which lose any trailing zeroes, decimal point information is retained in the `:decimals` value
 * formulas are not read from cells with date and time formats
 
 Within these limitations the cell hash's :format holds the best analysis of the original cell format but as there's no way to extract all of the format information directly from the sheet some information may need to be refurbished as required after import via Rxl.
@@ -88,7 +89,7 @@ The format of the excel table read hash has the following skeleton:
 
 ```ruby
 {
-    "Sheet1" => [
+    'Sheet1' => [
       {
           header_a: value,
           header_b: value
@@ -120,12 +121,12 @@ Returns the files with sheet contents populated with hash of cells (or array of 
 ```ruby
 {
   first_file: {
-    "Sheet1" => 'sheet_contents',
-    "Sheet2" => 'sheet_contents'
+    'Sheet1' => 'sheet_contents',
+    'Sheet2' => 'sheet_contents'
   },
   second_file: {
-    "Sheet1" => 'sheet_contents',
-    "Sheet2" => 'sheet_contents'
+    'Sheet1' => 'sheet_contents',
+    'Sheet2' => 'sheet_contents'
   },
 }
 ```
@@ -142,7 +143,7 @@ The format of the excel hash_workbook has sheet names as keys and hashes of cell
 
 ```ruby
 {
-    "Sheet1" => {
+    'Sheet1' => {
       'A1' => {
           value: 'abc'
       }
@@ -152,21 +153,58 @@ The format of the excel hash_workbook has sheet names as keys and hashes of cell
 
 #### Cell specification
 
-All cells are written with the format set to general except those with a number format specified
+##### Output formatting
+
+All cells are written with the format set to general by default
+
+If the value is a DateTime object then use `:date_format` with a date format as per the below examples, the default is 'dd/mm/yyyy'
+
+If `:format` is given as `:percentage` where the value is a number or float then the format defaults to a matching format (eg '0' for 1, '0.0' for 0.1), override using `:number_format` if trailing zeroes are required or rounding is needed
 
 Specify the number format according to https://support.office.com/en-us/article/number-format-codes-5026bbd6-04bc-48cd-bf33-80f18b4eae68?ui=en-US&rs=en-US&ad=US
 
 Examples:
 
-| value        | number format | resulting cell format | resulting cell value |
+| value        | number_format | resulting cell format | resulting cell value |
 |--------------|---------------|-----------------------|----------------------|
-| 0            | 0             | number                | 0                    |
-| 0.49         | 0             | number                | 0                    |
-| 0.5          | 0             | number                | 1                    |
-| 0            | 0.00          | number                | 0.00                 |
-| 0            | 0%            | percentage            | 0%                   |
-| 1            | 0%            | percentage            | 100%                 |
+| 0            | '0'           | number                | 0                    |
+| 0.49         | '0'           | number                | 0                    |
+| 0.5          | '0'           | number                | 1                    |
+| 0            | '0.00'        | number                | 0.00                 |
+| 0.5          | '0.00'        | number                | 0.50                 |
+| 0            |' 0%'          | percentage            | 0%                   |
+| 1            | '0%'          | percentage            | 100%                 |
+| 0.101        | '0.00%'       | percentage            | 10.10%               |
+| 1            | '0.00%'       | percentage            | 100.00%              |
+
+| value        | date_format   | resulting cell format | resulting cell value |
+|--------------|---------------|-----------------------|----------------------|
 | '01/01/2000' | 'dd/mm/yyyy'  | date                  | 01/01/2000           |
+| '01/01/2000' | 'dd-mmm-yyyy' | date                  | 01-Jan-2000          |
+| '01:00:00'   | 'hh:mm:ss'    | time                  | 01:00:00             |
+
+##### Cell formatting
+
+TODO: add more cell formatting
+
+```ruby
+{
+  'A1' => {
+    value: 'some_text',
+    font_name: 'Arial',
+    font_size: 8,
+    bold: true,
+    h_align: :center,
+    v_align: :center,
+    fill: 'a1b2c3',
+    border: { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' }
+  }
+}
+```
+
+##### Formulas
+
+Formulas are read and written from/to the `:formula` value and on write supercede and value specified, however due to some unknown issue, formulas which were written via this gem can then be re-read but the cell value will be empty
 
 #### Write Validation
 
@@ -180,7 +218,6 @@ The following rules are validated for write_file:
 * The hash_worksheet values must be hashes (specifying cells)
 * The hash_cell keys must conform the the cell specification as below
 
-* If a formula is provided the value must be nil or an empty string
 * If a number format is provided the value must be consistent with it
 
 
@@ -197,6 +234,76 @@ Other keys can be specified:
 * h_align: :left (default), :centre or :right
 
 TODO: add full description for hash_cell_to_rubyxl_cell and rubyxl_cell_to_hash_cell (and check they're as consistent as possible)
+
+### Write to file as tables
+
+To write a file as pass the filename and hash:
+
+```ruby
+Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables, order)
+```
+
+The worksheets' top row will be populated with values specified in the `order` array. Those array items will also be used to extract the current row from the current hash.
+
+* use `nil` in the `order` array to leave blank columns (including blank header)
+* string or symbol keys can be used, so long as the key in order is the same as in the hashes
+
+The format of the excel hash_workbook has sheet names as keys and hashes of rows as values:
+
+```ruby
+order = %i[header_a header_b]
+hash_tables = {
+  'Sheet1' => [
+    {
+      header_a: 'some_value',
+      header_b: 'other_value'
+    },
+    {
+      header_a: 'some_value',
+      header_b: 'other_value'
+    }
+  ]
+}
+```
+
+#### Formatting for tables
+
+Add formatting to tables by adding a `:formats` key to the top level hash.
+
+Inside the formatting hash add child hashes with keys for the relevant table.
+
+Within the table add hashes for each column with the key as the column letter and the value as a cell hash (excluding `:value`).
+
+Formatting for rows is not currently implemented.
+
+Additionally inside the table hash add a key `:headers` with a cell hash (excluding `:value`) to set formatting for the header row.
+
+```ruby
+order = %i[header_a header_b]
+hash_tables = {
+  formats: {
+    'Sheet1' => {
+      headers: {
+        bold: true,
+        align: 'center'
+      },
+      'B' => {
+        fill: 'feb302'
+      }
+    }
+  },
+  'Sheet1' => [
+    {
+      'col_1' => 'some_value',
+      'col_2' => 'other_value'
+    },
+    {
+      'col_1' => 'some_value',
+      'col_2' => 'other_value'
+    }
+  ]
+}
+```
 
 ## Development
 

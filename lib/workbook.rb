@@ -26,6 +26,16 @@ module Workbook
     rubyxl_workbook
   end
 
+  def self.hashes_to_hash_workbook(hash_tables, order, write_headers: true)
+    hash_workbook = {}
+    all_formats = hash_tables.delete(:formats) || {}
+    hash_tables.each do |k, v|
+      formats = all_formats[k]
+      hash_workbook[k] = Worksheet.hashes_to_hash_worksheet(v, order, formats, write_headers: write_headers)
+    end
+    hash_workbook
+  end
+
   def self.hash_workbook_to_hash_tables(hash_workbook)
     hash_workbook.keys.each_with_object({}) do |key, hash_tables|
       hash_tables[key] = Worksheet.hash_worksheet_to_hash_table(hash_workbook[key])
