@@ -223,6 +223,21 @@ describe Rxl do
         end
       end
 
+      it 'saves a file with formatting values applied' do
+        path = ENV['TEMP_XLSX_PATH']
+        save_hash = RxlSpecHelpers.test_data(:write_hash, :save_with_formatting)
+        save_filepath = RxlSpecHelpers.test_data(:filepath, :save_with_formatting, path: path)
+        expected = RxlSpecHelpers.test_data(:expected_hash, :save_with_formatting)
+        Rxl.write_file(save_filepath, save_hash)
+        read_hash = Rxl.read_file(save_filepath)
+        expect({ keys: read_hash['sheet'].keys }).to eq({ keys: expected.keys })
+        expected.each do |key, value|
+          value.each do |attr_key, attr_value|
+            expect({ key => read_hash['sheet'][key][attr_key] }).to eq({ key => attr_value })
+          end
+        end
+      end
+
       it 'saves an array of hashes as a table' do
         path = ENV['TEMP_XLSX_PATH']
         save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)

@@ -183,6 +183,25 @@ Examples:
 | '01/01/2000' | 'dd-mmm-yyyy' | date                  | 01-Jan-2000          |
 | '01:00:00'   | 'hh:mm:ss'    | time                  | 01:00:00             |
 
+##### Cell formatting
+
+TODO: add more cell formatting
+
+```ruby
+{
+  'A1' => {
+    value: 'some_text',
+    font_name: 'Arial',
+    font_size: 8,
+    bold: true,
+    h_align: :center,
+    v_align: :center,
+    fill: 'a1b2c3',
+    border: { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' }
+  }
+}
+```
+
 ##### Formulas
 
 Formulas are read and written from/to the `:formula` value and on write supercede and value specified, however due to some unknown issue, formulas which were written via this gem can then be re-read but the cell value will be empty

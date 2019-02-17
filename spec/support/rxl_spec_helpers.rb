@@ -26,6 +26,7 @@ module RxlSpecHelpers
         save_as_table_with_formatting: save_as_table_with_formatting_hashes,
         save_with_content: save_with_content_hash,
         save_with_format: save_with_format_hash,
+        save_with_formatting: save_with_formatting_hash,
         save_with_formula: save_with_formula_hash,
         test_file: {},
         worksheet_names: { 'test_a' => {}, 'test_b' => {} }
@@ -145,7 +146,8 @@ module RxlSpecHelpers
       as_tables: as_tables_expected_hash,
       tables_ignore_no_header_columns: tables_ignore_no_header_columns_expected_hash,
       save_with_format: save_with_format_expected_hash,
-      save_with_formula: save_with_formula_expected_hash
+      save_with_formatting: save_with_formatting_expected_hash,
+      save_with_formula: save_with_formula_expected_hash,
     }[key]
   end
 
@@ -389,6 +391,28 @@ module RxlSpecHelpers
       'D7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
       'E7' => { value: '', format: :text, formula: 'TIME(10,15,30)' },
       'F7' => { value: '', format: :text, formula: 'TIME(10,15,30)' }
+    }
+  end
+
+  def self.save_with_formatting_hash
+    {
+      'sheet' => {
+        'A1' => { value: 'abc', bold: true },
+        'A2' => { value: 'abc', fill: '6b7bfb' },
+        'A3' => { value: 'abc', font_name: 'Arial' },
+        'A4' => { value: 'abc', font_size: 8 },
+        'A5' => { value: 'abc', border: { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' } },
+      }
+    }
+  end
+
+  def self.save_with_formatting_expected_hash
+    {
+      'A1' => { value: 'abc', bold: true },
+      'A2' => { value: 'abc', fill: '6b7bfb' },
+      'A3' => { value: 'abc', font_name: 'Arial' },
+      'A4' => { value: 'abc', font_size: 8 },
+      'A5' => { value: 'abc', border: { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' } },
     }
   end
 

@@ -85,17 +85,17 @@ module Cell
     rubyxl_worksheet.merge_cells(row_index, column_index, merge_column_index, merge_row_index) if combined_hash_cell[:merge]
     rubyxl_worksheet.change_column_width(column_index, combined_hash_cell[:width])  if combined_hash_cell[:width]
 
-    rubyxl_worksheet[row_index][column_index].change_font_name(combined_hash_cell[:font_style]) if combined_hash_cell[:font_style]
+    rubyxl_worksheet[row_index][column_index].change_font_name(combined_hash_cell[:font_name]) if combined_hash_cell[:font_name]
     rubyxl_worksheet[row_index][column_index].change_font_size(combined_hash_cell[:font_size]) if combined_hash_cell[:font_size]
     rubyxl_worksheet[row_index][column_index].change_fill(combined_hash_cell[:fill]) if combined_hash_cell[:fill]
     rubyxl_worksheet[row_index][column_index].change_horizontal_alignment(combined_hash_cell[:h_align]) if combined_hash_cell[:h_align]
     rubyxl_worksheet[row_index][column_index].change_font_bold(combined_hash_cell[:bold]) if combined_hash_cell[:bold]
 
-    if combined_hash_cell[:border_all]
-      rubyxl_worksheet[row_index][column_index].change_border('top' , combined_hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('bottom' , combined_hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('left' , combined_hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('right' , combined_hash_cell[:border_all])
+    if combined_hash_cell[:border]
+      rubyxl_worksheet[row_index][column_index].change_border('top' , combined_hash_cell[:border][:top])
+      rubyxl_worksheet[row_index][column_index].change_border('bottom' , combined_hash_cell[:border][:bottom])
+      rubyxl_worksheet[row_index][column_index].change_border('left' , combined_hash_cell[:border][:left])
+      rubyxl_worksheet[row_index][column_index].change_border('right' , combined_hash_cell[:border][:right])
     end
   end
 
