@@ -10,8 +10,8 @@ module Rxl
     nil
   end
 
-  def self.write_file_as_tables(filepath, hash_tables, order, write_headers: true)
-    hash_workbook = Workbook.hashes_to_hash_workbook(hash_tables, order, write_headers: write_headers)
+  def self.write_file_as_tables(filepath, hash_tables, write_headers: true)
+    hash_workbook = Workbook.hashes_to_hash_workbook(hash_tables, write_headers: write_headers)
     write_file(filepath, hash_workbook)
     nil
   end

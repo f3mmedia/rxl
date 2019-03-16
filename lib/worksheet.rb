@@ -38,11 +38,11 @@ module Worksheet
   ###     GET RUBYXL WORKSHEET FROM HASHES     ###
   ################################################
 
-  def self.hashes_to_hash_worksheet(hashes, order, formats, write_headers: true)
+  def self.hashes_to_hash_worksheet(hashes, columns, formats, write_headers: true)
     rows = hashes.map do |hash|
-      order.map { |item| hash[item] }
+      columns.map { |item| hash[item] }
     end
-    rows.unshift(order.map { |item| "#{item}" }) if write_headers
+    rows.unshift(columns.map { |item| "#{item}" }) if write_headers
     hash_worksheet = rows_to_hash_worksheet(rows)
     format_hash_worksheet(hash_worksheet, formats, write_headers) if formats
     hash_worksheet
