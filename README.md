@@ -10,6 +10,10 @@ The mechanics of the conversion between xlsx and ruby hash have been implemented
 
 https://github.com/weshatheleopard/rubyXL
 
+## Breaking changes
+
+Version 0.6.0 introduces a breaking change in the format of inputs for writing as tables, refer to revised documentation below.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -240,35 +244,37 @@ TODO: add full description for hash_cell_to_rubyxl_cell and rubyxl_cell_to_hash_
 To write a file as pass the filename and hash:
 
 ```ruby
-Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables, order)
+Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables)
 ```
 
-The worksheets' top row will be populated with values specified in the `order` array. Those array items will also be used to extract the current row from the current hash.
+The worksheets' top row will be populated with values specified in the `columns` array. Those array items will also be used to extract the current row from the current hash.
 
-* use `nil` in the `order` array to leave blank columns (including blank header)
+* use `nil` in the `columns` array to leave blank columns (including blank header)
 * string or symbol keys can be used, so long as the key in order is the same as in the hashes
 
 The format of the excel hash_workbook has sheet names as keys and hashes of rows as values:
 
 ```ruby
-order = %i[header_a header_b]
 hash_tables = {
-  'Sheet1' => [
-    {
-      header_a: 'some_value',
-      header_b: 'other_value'
-    },
-    {
-      header_a: 'some_value',
-      header_b: 'other_value'
-    }
-  ]
+  'Sheet1' => {
+    columns: %i[header_a header_b],
+    rows: [
+      {
+        header_a: 'some_value',
+        header_b: 'other_value'
+      },
+      {
+        header_a: 'some_value',
+        header_b: 'other_value'
+      }
+    ]
+  }
 }
 ```
 
 #### Formatting for tables
 
-Add formatting to tables by adding a `:formats` key to the top level hash.
+Add formatting to tables by adding a `:formats` key to the sheet hash.
 
 Inside the formatting hash add child hashes with keys for the relevant table.
 
@@ -279,10 +285,10 @@ Formatting for rows is not currently implemented.
 Additionally inside the table hash add a key `:headers` with a cell hash (excluding `:value`) to set formatting for the header row.
 
 ```ruby
-order = %i[header_a header_b]
 hash_tables = {
-  formats: {
-    'Sheet1' => {
+  'Sheet1' => {
+    columns: %i[header_a header_b],
+    formats: {
       headers: {
         bold: true,
         align: 'center'
@@ -290,18 +296,18 @@ hash_tables = {
       'B' => {
         fill: 'feb302'
       }
-    }
-  },
-  'Sheet1' => [
-    {
-      'col_1' => 'some_value',
-      'col_2' => 'other_value'
     },
-    {
-      'col_1' => 'some_value',
-      'col_2' => 'other_value'
-    }
-  ]
+    rows: [
+      {
+        'col_1' => 'some_value',
+        'col_2' => 'other_value'
+      },
+      {
+        'col_1' => 'some_value',
+        'col_2' => 'other_value'
+      }
+    ]
+  }
 }
 ```
 
