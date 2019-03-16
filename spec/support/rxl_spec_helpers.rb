@@ -526,24 +526,26 @@ module RxlSpecHelpers
 
   def self.save_as_table_hashes
     {
-      orders: { 'test' => %w[col_1 col_2] },
-      'test' => [
-        {
-          'col_1' => 'r1c1',
-          'col_2' => 'r1c2'
-        },
-        {
-          'col_1' => 'r2c1',
-          'col_2' => 'r2c2'
-        }
-      ]
+      'test' => {
+        columns: %w[col_1 col_2],
+        rows: [
+          {
+            'col_1' => 'r1c1',
+            'col_2' => 'r1c2'
+          },
+          {
+            'col_1' => 'r2c1',
+            'col_2' => 'r2c2'
+          }
+        ]
+      }
     }
   end
 
   def self.save_as_table_with_formatting_hashes
     {
-      formats: {
-        'Sheet1' => {
+      'Sheet1' => {
+        formats: {
           headers: {
             bold: true,
             h_align: 'center'
@@ -551,19 +553,19 @@ module RxlSpecHelpers
           'B' => {
             fill: 'feb302'
           }
-        }
-      },
-      orders: { 'Sheet1' => %w[col_1 col_2] },
-      'Sheet1' => [
-        {
-          'col_1' => 'some_value',
-          'col_2' => 'other_value'
         },
-        {
-          'col_1' => 'some_value',
-          'col_2' => 'other_value'
-        }
-      ]
+        columns: %w[col_1 col_2],
+        rows: [
+          {
+            'col_1' => 'some_value',
+            'col_2' => 'other_value'
+          },
+          {
+            'col_1' => 'some_value',
+            'col_2' => 'other_value'
+          }
+        ]
+      }
     }
   end
 
