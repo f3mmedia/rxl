@@ -526,6 +526,7 @@ module RxlSpecHelpers
 
   def self.save_as_table_hashes
     {
+      orders: { 'test' => %w[col_1 col_2] },
       'test' => [
         {
           'col_1' => 'r1c1',
@@ -552,6 +553,7 @@ module RxlSpecHelpers
           }
         }
       },
+      orders: { 'Sheet1' => %w[col_1 col_2] },
       'Sheet1' => [
         {
           'col_1' => 'some_value',

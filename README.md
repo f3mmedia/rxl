@@ -240,7 +240,7 @@ TODO: add full description for hash_cell_to_rubyxl_cell and rubyxl_cell_to_hash_
 To write a file as pass the filename and hash:
 
 ```ruby
-Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables, order)
+Rxl.write_file_as_tables('path/to/save.xlsx', hash_tables)
 ```
 
 The worksheets' top row will be populated with values specified in the `order` array. Those array items will also be used to extract the current row from the current hash.
@@ -251,8 +251,10 @@ The worksheets' top row will be populated with values specified in the `order` a
 The format of the excel hash_workbook has sheet names as keys and hashes of rows as values:
 
 ```ruby
-order = %i[header_a header_b]
 hash_tables = {
+  orders: [
+    'Sheet1' => %i[header_a header_b],
+  ],
   'Sheet1' => [
     {
       header_a: 'some_value',
@@ -279,7 +281,6 @@ Formatting for rows is not currently implemented.
 Additionally inside the table hash add a key `:headers` with a cell hash (excluding `:value`) to set formatting for the header row.
 
 ```ruby
-order = %i[header_a header_b]
 hash_tables = {
   formats: {
     'Sheet1' => {
@@ -292,6 +293,9 @@ hash_tables = {
       }
     }
   },
+  orders: [
+    'Sheet1' => %i[header_a header_b],
+  ],
   'Sheet1' => [
     {
       'col_1' => 'some_value',

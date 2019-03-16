@@ -242,8 +242,7 @@ describe Rxl do
         path = ENV['TEMP_XLSX_PATH']
         save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
         save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
-        order = %w[col_1 col_2]
-        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        error = Rxl.write_file_as_tables(save_filepath, save_hash)
         expect(error).to be_nil
         read_hash = Rxl.read_file_as_tables(save_filepath)
         expect(read_hash).to be_a(Hash)
@@ -256,8 +255,7 @@ describe Rxl do
         path = ENV['TEMP_XLSX_PATH']
         save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table)
         save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table, path: path)
-        order = %w[col_1 col_2]
-        error = Rxl.write_file_as_tables(save_filepath, save_hash, order, write_headers: false)
+        error = Rxl.write_file_as_tables(save_filepath, save_hash, write_headers: false)
         expect(error).to be_nil
         read_hash = Rxl.read_file(save_filepath)
         expect(read_hash).to be_a(Hash)
@@ -270,8 +268,7 @@ describe Rxl do
         path = ENV['TEMP_XLSX_PATH']
         save_hash = RxlSpecHelpers.test_data(:write_hash, :save_as_table_with_formatting)
         save_filepath = RxlSpecHelpers.test_data(:filepath, :save_as_table_with_formatting, path: path)
-        order = %w[col_1 col_2]
-        error = Rxl.write_file_as_tables(save_filepath, save_hash, order)
+        error = Rxl.write_file_as_tables(save_filepath, save_hash)
         expect(error).to be_nil
         read_hash = Rxl.read_file(save_filepath)
         expect(read_hash).to be_a(Hash)
