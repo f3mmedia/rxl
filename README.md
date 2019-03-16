@@ -10,6 +10,10 @@ The mechanics of the conversion between xlsx and ruby hash have been implemented
 
 https://github.com/weshatheleopard/rubyXL
 
+## Breaking changes
+
+Version 0.6.0 introduces a breaking change in the format of inputs for writing as tables, refer to revised documentation below.
+
 ## Installation
 
 Add this line to your application's Gemfile:
