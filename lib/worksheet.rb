@@ -1,5 +1,4 @@
 require 'rubyXL'
-require 'mitrush'
 require_relative 'cell'
 require_relative 'cells'
 
@@ -15,7 +14,7 @@ module Worksheet
     end
     hash_worksheet = Cells.rubyxl_to_hash(rubyxl_rows)
     process_sheet_to_populated_block(hash_worksheet)
-    Mitrush.delete_keys(hash_worksheet, %i[row_count column_count])
+    hash_worksheet.delete_if { |key, _| %i[row_count column_count].include?(key) }
     hash_worksheet
   end
 
@@ -102,7 +101,7 @@ module Worksheet
   ####################################
 
   def self.hash_worksheet_to_hash_table(raw_hash)
-    cells = Mitrush.deep_copy(raw_hash)
+    cells = Marshal.load(Marshal.dump(raw_hash))  # deep copy the raw_hash
     columns = cells.keys.map { |key| key[/\D+/] }.uniq
     columns.delete_if { |item| cells["#{item}1"][:value].nil? }
     row_nums = cells.keys.map { |key| key[/\d+/].to_i }.uniq[1..-1] || []
