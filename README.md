@@ -12,7 +12,13 @@ https://github.com/weshatheleopard/rubyXL
 
 ## Breaking changes
 
-Version 0.6.0 introduces a breaking change in the format of inputs for writing as tables, refer to revised documentation below.
+Version 0.6.0 introduces a breaking change in the format of inputs for writing as tables.
+
+See revised documentation for sections: Write to file as tables, Formatting for tables
+- "order" has been renamed "columns"
+- "order" and "formats" have been brought within their respective sheet hash
+
+This enables setting of these configurables on a per sheet basis instead of setting them once for all sheets
 
 ## Installation
 
